@@ -12,10 +12,10 @@ import pandas as pd
 # from django.db import transaction
 
 qs_bracket = Bracket.objects.all()
-df_bracket = qs_bracket.to_dataframe(fieldnames=['player','contestant','predicted_elimination'])
+df_bracket = read_frame(qs_bracket,fieldnames=['player','contestant','predicted_elimination'])
 
 qs_contestant = Contestant.objects.all()
-df_contestant = qs_contestant.to_dataframe(fieldnames=['first_name','last_name','shameful_exit','actual_elimination'])
+df_contestant = read_frame(qs_contestant,fieldnames=['first_name','last_name','shameful_exit','actual_elimination'])
 df_contestant['contestant'] = df_contestant['first_name'] + ' ' + df_contestant['last_name']
 df_contestant.drop(columns=['first_name','last_name'],inplace=True)
 
