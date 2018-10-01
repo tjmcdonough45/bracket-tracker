@@ -1,0 +1,62 @@
+/* h1,h2{
+  color: red;
+  text-align: center;
+} */
+
+/* body {
+  background-image: url("/static/BracketApp/images/logo.png");
+  background-position: center;
+  background-repeat: no-repeat;
+} */
+
+img{
+  width:25%;
+  margin-left: 37.5%;
+  margin-right: 37.5%;
+}
+
+/* table{
+  border-collapse: collapse;
+  width:50%;
+  margin-left: 25%;
+  margin-right: 25%;
+}
+
+th,td{
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even){
+  background-color: #f2f2f2;
+}
+
+tr:hover{
+  background-color: blue;
+  color:white;
+}
+
+div{
+  overflow-x:auto;
+}
+
+.brackets{
+  border: 2px solid blue;
+  width: 50%;
+  text-align: center;
+  margin: auto;
+}
+
+.results{
+  border: 2px solid black;
+  width: 50%;
+  text-align: center;
+  margin: auto;
+}
+
+.scores{
+  border: 2px solid black;
+  width: 50%;
+  text-align: center;
+  margin: auto;
+} */

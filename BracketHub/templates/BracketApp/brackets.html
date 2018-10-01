@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+{% extends "BracketApp/base.html" %}
+
+  {% load staticfiles %}
+
+  {% block body_block %}
+  <img src="{% static "BracketApp/images/logo.png" %}" alt="That sucks!">
+
+  <div class="cur_scores">
+    <h1>CURRENT STANDINGS</h1>
+    {% if cur_scores %}
+      <table class="table table-hover">
+        <thead>
+          <th>Player</th>
+          <th>Place</th>
+          <th>Cumulative Score</th>
+          <th>Points Back from Leader</th>
+        </thead>
+        {% for entry in cur_scores %}
+          <tr>
+            <td>{{entry.player}}</td>
+            <td>{{entry.rank}}</td>
+            <td>{{entry.cum_score}}</td>
+            <td>{{entry.points_back}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO RESULTS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
+  <div class="results">
+    <h1>ELIMINATED CONTESTANTS</h1>
+    {% if results %}
+      <table class="table table-hover">
+        <thead>
+          <th>Elimination</th>
+          <th>Contestant</th>
+          <th>Shameful Exit?</th>
+        </thead>
+        {% for entry in results %}
+          <tr>
+            <td>{{entry.actual_elimination}}</td>
+            <td>{{entry.first_name}} {{entry.last_name}}</td>
+            <td>{{entry.shameful_exit}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO RESULTS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
+  <div class="brackets">
+    <h1>BRACKETS</h1>
+    {% if brackets %}
+      {% for key,value in brackets.items %}
+        <h2>{{ key }}</h2>
+        <table class="table table-hover">
+          <thead>
+            <th>Elimination</th>
+            <th>Contestant</th>
+          </thead>
+          {% for bracket in value %}
+            <tr>
+              <td>{{bracket.predicted_elimination}}</td>
+              <td>{{bracket.contestant}}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% endfor %}
+    {% else %}
+      <p>NO BRACKETS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
+  <div class="scores">
+    <h1>FULL SCORES</h1>
+    {% if scores %}
+      {% for key,value in scores.items %}
+        <h2>{{ key }}</h2>
+        <table class="table table-hover">
+          <tr>
+            <td><b>Elimination</b></td>
+            {% for score in value %}
+              <td>{{ score.elimination }}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td><b>Score</b></td>
+            {% for score in value %}
+              <td>{{ score.score }}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td><b>Cumulative Score</b></td>
+            {% for score in value %}
+              <td>{{ score.cum_score }}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td><b>Place</b></td>
+            {% for score in value %}
+              <td>{{ score.rank }}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td><b>Points Back from Leader</b></td>
+            {% for score in value %}
+              <td>{{ score.points_back }}</td>
+            {% endfor %}
+          </tr>
+        </table>
+      {% endfor %}
+    {% else %}
+      <p>NO SCORES!</p>
+      {% endif %}
+  </div>
+
+  {% endblock %}
