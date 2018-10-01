@@ -1,5 +1,5 @@
 from django.db import models
-from django_pandas.managers import DataFrameManager
+# from django_pandas.managers import DataFrameManager
 from datetime import datetime
 
 #Superuser information
@@ -41,7 +41,7 @@ class Contestant(models.Model):
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
 
-    objects = DataFrameManager()
+#     objects = DataFrameManager()
 
 class Bracket(models.Model):
     season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
@@ -52,7 +52,7 @@ class Bracket(models.Model):
     def __str__(self):
         return "%s, %s, %s" % (self.player, self.contestant, self.predicted_elimination)
 
-    objects = DataFrameManager()
+#     objects = DataFrameManager()
 
 class Score(models.Model):
     player = models.CharField(max_length=69,default='John Snow')
