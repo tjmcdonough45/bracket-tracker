@@ -2,11 +2,6 @@ from django.db import models
 # from django_pandas.managers import DataFrameManager
 from datetime import datetime
 
-#Superuser information
-#User: Tom
-#Email: test@gmail.com
-#Password: ayaev6969
-
 # Create your models here.
 class Show(models.Model):
     name = models.CharField(max_length=69,default='Survivor')
