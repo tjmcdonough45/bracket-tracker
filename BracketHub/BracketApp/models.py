@@ -37,6 +37,9 @@ class Contestant(models.Model):
     last_name = models.CharField(max_length=69,default='Snow')
     shameful_exit = models.BooleanField(default=False)
     actual_elimination = models.PositiveIntegerField(default=69)
+    num_confessionals = models.PositiveIntegerField(default=0)
+    num_individual_immunity_wins = models.PositiveIntegerField(default=0)
+    num_votes_against = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -64,3 +67,13 @@ class Score(models.Model):
 
     def __str__(self):
         return "%s, %s, %s, %s" % (self.player, self.elimination, self.score, self.cum_score)
+
+class Bonus(models.Model):
+    season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
+    player = models.ForeignKey(Player, on_delete=models.PROTECT)
+    most_confessionals = models.ForeignKey(Contestant, related_name='q1', on_delete=models.PROTECT)
+    most_individual_immunity_wins = models.ForeignKey(Contestant, related_name='q2', on_delete=models.PROTECT)
+    most_votes_against = models.ForeignKey(Contestant, related_name='q3', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return "%s, %s" % (self.season,self.player)
