@@ -26,7 +26,7 @@
         {% endfor %}
       </table>
     {% else %}
-      <p>NO RESULTS!</p>
+      <p>NO CURRENT SCORES!</p>
     {% endif %}
   </div>
 
@@ -51,6 +51,32 @@
       </table>
     {% else %}
       <p>NO RESULTS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
+  <div class="bonus">
+    <h1>BONUS STATUS</h1>
+    {% if bonus %}
+      <table class="table table-hover">
+        <thead>
+          <th>Contestant</th>
+          <th>Confessionals</th>
+          <th>Individual Immunity Wins</th>
+          <th>Votes Against</th>
+        </thead>
+        {% for entry in bonus %}
+          <tr>
+            <td>{{entry.first_name}} {{entry.last_name}}</td>
+            <td>{{entry.num_confessionals}}</td>
+            <td>{{entry.num_individual_immunity_wins}}</td>
+            <td>{{entry.num_votes_against}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO BONUSES!</p>
     {% endif %}
   </div>
 
