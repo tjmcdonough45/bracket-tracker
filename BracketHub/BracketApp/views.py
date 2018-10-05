@@ -7,7 +7,7 @@ from BracketApp import form
 from BracketApp.form import PlayerInput,BracketInput
 import numpy as np
 
-num_eliminations=2 #eventually have this set from the value in current_season
+num_eliminations=1 #eventually have this set from the value in current_season
 
 # Create your views here.
 def index(request):
@@ -25,7 +25,7 @@ def brackets(request):
     for player in player_list:
         # bracket_dict[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
         score_dict[player] = Score.objects.filter(player__exact=player).order_by('elimination')
-    for i in np.arange(20)+1:
+    for i in np.arange(19)+1:
         bracket_dict[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name') #why does this need to be flipped to match player_list order?
     result_list = Contestant.objects.filter(actual_elimination__lte=num_eliminations).order_by('actual_rank')
     bonus_list = Contestant.objects.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
