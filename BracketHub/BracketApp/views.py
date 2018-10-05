@@ -5,8 +5,9 @@ from django.http import HttpResponseRedirect
 from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
 from BracketApp import form
 from BracketApp.form import PlayerInput,BracketInput
+import numpy as np
 
-num_eliminations=2 #eventually have this set from the value in current_season
+num_eliminations=1 #eventually have this set from the value in current_season
 
 # Create your views here.
 def index(request):
@@ -22,9 +23,11 @@ def brackets(request):
     bracket_dict = {}
     score_dict = {}
     for player in player_list:
-        bracket_dict[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_elimination')
+        # bracket_dict[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
         score_dict[player] = Score.objects.filter(player__exact=player).order_by('elimination')
-    result_list = Contestant.objects.filter(actual_elimination__lte=num_eliminations).order_by('actual_elimination')
+    for i in np.arange(19)+1:
+        bracket_dict[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name') #why does this need to be flipped to match player_list order?
+    result_list = Contestant.objects.filter(actual_elimination__lte=num_eliminations).order_by('actual_rank')
     bonus_list = Contestant.objects.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
     cur_score_list = Score.objects.filter(elimination__exact=num_eliminations).order_by('rank')
     # score_list = Score.objects.order_by('elimination','score')
@@ -61,7 +64,7 @@ def bracket_input_view(request):
         if player_form.is_valid() and bracket_form.is_valid():
             new_bracket = bracket_form.save(commit=False)
             new_bracket.player = player_form.save()
-            new_bracket = bf.save()
+            new_bracket = bracket_form.save()
             return index(request)
         else:
             print('FAILED')
