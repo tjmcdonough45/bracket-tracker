@@ -20,20 +20,24 @@ def help(request):
 def current_season(request):
     season = Season.objects.filter(current_season__exact=True)
     cur_elimination = season.values()[0]['current_elimination']
+    # cur_elimination = season.current_elimination
+    cur_scoring_round = cur_elimination-1
     players = Player.objects.order_by('name')
     contestants = Contestant.objects.filter(season__current_season__exact=True)
     num_eliminations = len(contestants.values_list('last_name',flat=True))-1
+    num_scoring_rounds = num_eliminations-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
     brackets = {}
     scores = {}
     for player in players:
         # brackets[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
-        scores[player] = Score.objects.filter(player__exact=player).order_by('elimination')
+        scores[player] = Score.objects.filter(season__current_season__exact=True,player__exact=player).order_by('elimination')
     for i in np.arange(num_eliminations)+1:
         brackets[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
     cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank')
-    dict = {'season':season,'players':players,'brackets':brackets,'cur_boots':cur_boots,'bonus':bonus,'scores':scores,'cur_scores':cur_scores}
+    dict = {'season':season,'players':players,'brackets':brackets,'cur_boots':cur_boots,'bonus':bonus,
+        'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
     return render(request,'BracketApp/current_season.html',context=dict)
 
 # def bracket_input_view(request):

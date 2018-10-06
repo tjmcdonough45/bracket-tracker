@@ -91,6 +91,8 @@ def score():
     # engine = create_engine('sqlite:///db.sqlite3',echo=False)
     # df_score.to_sql(name=Score,con=engine,if_exists='replace',index=False)
 
+    Score.objects.all().delete()
+
     dict_score = df_score.to_dict('records')
     # print(dict_score,'\n')
     s = Season.objects.get(current_season=True)

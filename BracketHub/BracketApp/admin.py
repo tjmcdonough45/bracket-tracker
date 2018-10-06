@@ -13,7 +13,7 @@ class SeasonAdmin(admin.ModelAdmin):
     search_fields = ['show__name','subtitle']
     list_filter = ['show']
     list_display = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
-    list_editable = ['current_elimination']
+    list_editable = ['current_season','current_elimination']
 
 class PlayerAdmin(admin.ModelAdmin):
     fields = ['name']

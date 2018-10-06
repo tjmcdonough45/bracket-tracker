@@ -15,6 +15,14 @@ img{
   margin-right: 37.5%;
 }
 
+.boot {
+  background-color: red;
+}
+
+th,td{
+    text-align: center;
+}
+
 /* table{
   border-collapse: collapse;
   width:50%;

@@ -61,8 +61,8 @@ class Score(models.Model):
     season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
     player = models.ForeignKey(Player,on_delete=models.PROTECT)
     elimination = models.PositiveIntegerField(default=0)
-    score = models.PositiveIntegerField(default=0)
-    cum_score = models.PositiveIntegerField(default=0)
+    score = models.IntegerField(default=0)
+    cum_score = models.IntegerField(default=0)
     rank = models.PositiveIntegerField(default=0)
     points_back = models.PositiveIntegerField(default=0)
 
