@@ -7,7 +7,11 @@
   <img src="{% static "BracketApp/images/logo.png" %}" alt="That sucks!">
 
   <div class="cur_scores">
-    <h1>CURRENT STANDINGS</h1>
+    {% if season %}
+      {% for entry in season %}
+          <h1>CURRENT STANDINGS (Scoring Elimination {{entry.current_elimination|add:-entry.first_scored_elimination|add:1}}</h1>
+      {% endfor %}
+    {% endif %}
     {% if cur_scores %}
       <table class="table table-hover">
         <thead>
@@ -34,14 +38,14 @@
 
   <div class="results">
     <h1>ELIMINATED CONTESTANTS</h1>
-    {% if results %}
+    {% if boots %}
       <table class="table table-hover">
         <thead>
           <th>Finish</th>
           <th>Contestant</th>
           <th>Shameful Exit?</th>
         </thead>
-        {% for entry in results %}
+        {% for entry in boots %}
           <tr>
             <td>{{entry.actual_rank}}</td>
             <td>{{entry.first_name}} {{entry.last_name}}</td>
@@ -50,7 +54,7 @@
         {% endfor %}
       </table>
     {% else %}
-      <p>NO RESULTS!</p>
+      <p>NO BOOTS!</p>
     {% endif %}
   </div>
 
@@ -83,7 +87,7 @@
   <p></p>
 
   <div class="bonus">
-    <h1>BONUS STATUS</h1>
+    <h1>BONUS STATS</h1>
     {% if bonus %}
       <table class="table table-hover">
         <thead>
@@ -102,7 +106,7 @@
         {% endfor %}
       </table>
     {% else %}
-      <p>NO BONUSES!</p>
+      <p>NO BONUS STATS!</p>
     {% endif %}
   </div>
 

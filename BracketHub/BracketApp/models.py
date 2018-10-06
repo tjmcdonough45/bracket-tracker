@@ -30,7 +30,7 @@ class Player(models.Model):
         # return "%s %s" % (self.first_name, self.last_name)
 
 class Contestant(models.Model):
-    season = models.ForeignKey(Season,default=69,on_delete=models.CASCADE)
+    season = models.ForeignKey(Season,default=69,on_delete=models.PROTECT)
     first_name = models.CharField(max_length=69,default='John')
     last_name = models.CharField(max_length=69,default='Snow')
     shameful_exit = models.BooleanField(default=False)
@@ -58,7 +58,8 @@ class Bracket(models.Model):
 #     objects = DataFrameManager()
 
 class Score(models.Model):
-    player = models.CharField(max_length=69,default='John Snow')
+    season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
+    player = models.ForeignKey(Player,on_delete=models.PROTECT)
     elimination = models.PositiveIntegerField(default=0)
     score = models.PositiveIntegerField(default=0)
     cum_score = models.PositiveIntegerField(default=0)
@@ -66,7 +67,7 @@ class Score(models.Model):
     points_back = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "%s, %s, %s, %s" % (self.player, self.elimination, self.score, self.cum_score)
+        return "%s" % (self.player)
 
 class Bonus(models.Model):
     season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)

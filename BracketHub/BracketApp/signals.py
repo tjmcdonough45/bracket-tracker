@@ -6,6 +6,5 @@ from BracketApp.management.commands.score import score
 @receiver(post_save,sender=Season)
 def run_score(sender,instance,created,**kwargs):
     if not created:
-        num_eliminations = instance.current_elimination
-        score(num_eliminations)
-    return(num_eliminations)
+        cur_elimination = instance.current_elimination
+        score()
