@@ -13,7 +13,7 @@ class SeasonAdmin(admin.ModelAdmin):
     search_fields = ['show__name','subtitle']
     list_filter = ['show']
     list_display = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
-    list_editable = ['current_elimination']
+    list_editable = ['current_season','current_elimination']
 
 class PlayerAdmin(admin.ModelAdmin):
     fields = ['name']
@@ -37,10 +37,10 @@ class BracketAdmin(admin.ModelAdmin):
     list_editable = ['contestant','predicted_rank','predicted_elimination']
 
 class ScoreAdmin(admin.ModelAdmin):
-    fields = ['player','elimination','rank','cum_score','points_back','score']
-    search_fields = ['player','elimination']
-    list_filter = ['player','elimination']
-    list_display = ['player','elimination','rank','cum_score','points_back','score']
+    fields = ['season','player','elimination','rank','cum_score','points_back','score']
+    search_fields = ['season__name','player__name','elimination']
+    list_filter = ['season','player','elimination']
+    list_display = ['season','player','elimination','rank','cum_score','points_back','score']
 
 class BonusAdmin(admin.ModelAdmin):
     fields = ['season','player','most_confessionals','most_individual_immunity_wins','most_votes_against']

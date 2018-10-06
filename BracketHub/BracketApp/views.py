@@ -7,7 +7,7 @@ from BracketApp import form
 from BracketApp.form import PlayerInput,BracketInput
 import numpy as np
 
-num_eliminations=1 #eventually have this set from the value in current_season
+cur_elimination=1 #eventually have this set from the value in current_season
 
 # Create your views here.
 def index(request):
@@ -17,22 +17,28 @@ def help(request):
     help_dict = {'help':'HELP PAGE'}
     return render(request,'BracketApp/help.html',context=help_dict)
 
-def brackets(request):
-    player_list = Player.objects.order_by('name')
-    # bracket_list = Bracket.objects.order_by('player','predicted_elimination')
-    bracket_dict = {}
-    score_dict = {}
-    for player in player_list:
-        # bracket_dict[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
-        score_dict[player] = Score.objects.filter(player__exact=player).order_by('elimination')
-    for i in np.arange(19)+1:
-        bracket_dict[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name') #why does this need to be flipped to match player_list order?
-    result_list = Contestant.objects.filter(actual_elimination__lte=num_eliminations).order_by('actual_rank')
-    bonus_list = Contestant.objects.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
-    cur_score_list = Score.objects.filter(elimination__exact=num_eliminations).order_by('rank')
-    # score_list = Score.objects.order_by('elimination','score')
-    dict = {'players':player_list,'brackets':bracket_dict,'results':result_list,'bonus':bonus_list,'scores':score_dict,'cur_scores':cur_score_list}
-    return render(request,'BracketApp/brackets.html',context=dict)
+def current_season(request):
+    season = Season.objects.filter(current_season__exact=True)
+    cur_elimination = season.values()[0]['current_elimination']
+    # cur_elimination = season.current_elimination
+    cur_scoring_round = cur_elimination-1
+    players = Player.objects.order_by('name')
+    contestants = Contestant.objects.filter(season__current_season__exact=True)
+    num_eliminations = len(contestants.values_list('last_name',flat=True))-1
+    num_scoring_rounds = num_eliminations-1
+    cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
+    brackets = {}
+    scores = {}
+    for player in players:
+        # brackets[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
+        scores[player] = Score.objects.filter(season__current_season__exact=True,player__exact=player).order_by('elimination')
+    for i in np.arange(num_eliminations)+1:
+        brackets[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
+    bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
+    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank')
+    dict = {'season':season,'players':players,'brackets':brackets,'cur_boots':cur_boots,'bonus':bonus,
+        'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
+    return render(request,'BracketApp/current_season.html',context=dict)
 
 # def bracket_input_view(request):
 #     form1 = form.BracketInput()
@@ -55,7 +61,7 @@ def brackets(request):
 #             print('ERROR FORM INVALID')
 #     return render(request,'BracketApp/form.html',{'form':form})
 
-def bracket_input_view(request):
+def bracket_entry(request):
     player_form = PlayerInput(prefix='player')
     bracket_form = BracketInput(prefix='bracket')
     if request.method == "POST":
