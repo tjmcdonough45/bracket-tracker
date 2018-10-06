@@ -22,7 +22,7 @@ def score():
     # print(df_bracket.head(),'\n')
 
     qs_contestant = Contestant.objects.filter(season__current_season__exact=True)
-    print(len(qs_contestant.values_list('last_name',flat=True)))
+    # print(len(qs_contestant.values_list('last_name',flat=True)))
     df_contestant = read_frame(qs_contestant)
     df_contestant['contestant'] = df_contestant['first_name'] + ' ' + df_contestant['last_name']
     df_contestant.drop(columns=['first_name','last_name'],inplace=True)
