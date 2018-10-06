@@ -1,12 +1,10 @@
-# Django Girls Tutorial (https://tutorial.djangogirls.org/en/deploy/)
-*.pyc
-*~
-__pycache__
-db.sqlite3
-/static
-.DS_store
-
-
+# Django Girls Tutorial (https://tutorial.djangogirls.org/en/deploy/):
+# *.pyc
+# *~
+# __pycache__
+# db.sqlite3
+# /static
+# .DS_store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
