@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+{% extends "BracketApp/base.html" %}
+  {% load staticfiles %}
+  {% block body_block %}
+    <h1>Past Seasons</h1>
+    <p></p>
+    {% if shows and seasons %}
+        {% for key,value in seasons.items %}
+          <h2>{{key}}</h2>
+          <p></p>
+          <ul>
+          {% for season in value %}
+              <li>{{season.show}}: {{season.subtitle}}</li>
+          {% endfor %}
+          </ul>
+          <p></p>
+        {% endfor %}
+    {% endif %}
+  {% endblock %}

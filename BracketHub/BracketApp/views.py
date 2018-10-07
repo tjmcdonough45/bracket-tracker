@@ -40,6 +40,14 @@ def current_season(request):
         'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
     return render(request,'BracketApp/current_season.html',context=dict)
 
+def past_seasons(request):
+    shows = Season.objects.order_by('show')
+    seasons = {}
+    for show in shows:
+        seasons[show] = Season.objects.filter(current_season__exact=False,show__name__exact=show).order_by('subtitle')
+    dict = {'shows':shows,'seasons':seasons}
+    return render(request,'BracketApp/past_seasons.html',context=dict)
+
 # def bracket_input_view(request):
 #     form1 = form.BracketInput()
 #     if request.method == 'POST':
