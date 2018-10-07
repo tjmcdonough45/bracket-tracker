@@ -9,10 +9,10 @@ class ShowAdmin(admin.ModelAdmin):
     # list_editable = ['name']
 
 class SeasonAdmin(admin.ModelAdmin):
-    fields = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
+    fields = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination']
     search_fields = ['show__name','subtitle']
     list_filter = ['show']
-    list_display = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
+    list_display = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination']
     list_editable = ['current_season','current_elimination']
 
 class PlayerAdmin(admin.ModelAdmin):
