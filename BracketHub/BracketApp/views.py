@@ -6,6 +6,8 @@ from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
 from BracketApp import form
 from BracketApp.form import PlayerInput,BracketInput
 import numpy as np
+from django.views.generic import View,TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
+from django.urls import reverse_lazy
 
 cur_elimination=1 #eventually have this set from the value in current_season
 
@@ -41,11 +43,12 @@ def current_season(request):
     return render(request,'BracketApp/current_season.html',context=dict)
 
 def past_seasons(request):
+    players = Player.objects.all()
     shows = Season.objects.order_by('show')
     seasons = {}
     for show in shows:
         seasons[show] = Season.objects.filter(current_season__exact=False,show__name__exact=show).order_by('subtitle')
-    dict = {'shows':shows,'seasons':seasons}
+    dict = {'players':players,'shows':shows,'seasons':seasons}
     return render(request,'BracketApp/past_seasons.html',context=dict)
 
 # def bracket_input_view(request):
@@ -86,3 +89,17 @@ def bracket_entry(request):
 
 def relative(request):
     return render(request,'BracketApp/relative_url_templates.html')
+
+# Class-Based Views (CBVs)
+
+class PlayerCreateView(CreateView):
+    fields = ('name',)
+    model = Player
+
+class PlayerUpdateView(UpdateView):
+    fields = ('name',)
+    model = Player
+
+class PlayerDeleteView(DeleteView):
+    model = Player
+    success_url = reverse_lazy('BracketApp:past_seasons')
