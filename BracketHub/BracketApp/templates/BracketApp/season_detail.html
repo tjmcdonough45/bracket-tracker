@@ -1,0 +1,15 @@
+{% extends "BracketApp/BracketApp_base.html" %}
+  {% load staticfiles %}
+  {% block body_block %}
+  <div class="jumbotron">
+    <h1>Season Details:</h1>
+    <p>{{season_detail.show}} {{season_detail.subtitle}}</p>
+    <p>{{season_detail.premiere}}</p>
+    <p>{{season_detail.current_season}}</p>
+    <p>{{season_detail.player_set}}</p>
+    <h3>Contestants:</h3>
+    {% for contestant in season_detail.contestants.all %}
+      <p>{{contestant.first_name}} {{contestant.last_name}}</p>
+    {% endfor %}
+  </div>
+  {% endblock %}

@@ -18,7 +18,8 @@ from django.urls import path,include
 from BracketApp import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    # path('',views.index,name='index'), #for FBV index
+    path('', views.IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('BracketApp/',include('BracketApp.urls')),
 ]

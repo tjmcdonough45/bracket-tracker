@@ -9,11 +9,11 @@ import numpy as np
 from django.views.generic import View,TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
 
-cur_elimination=1 #eventually have this set from the value in current_season
-
 # Create your views here.
-def index(request):
-    return render(request,'BracketApp/index.html')
+
+# Function Based Views (FBVs)
+# def index(request):
+#     return render(request,'BracketApp/index.html')
 
 def help(request):
     help_dict = {'help':'HELP PAGE'}
@@ -42,14 +42,14 @@ def current_season(request):
         'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
     return render(request,'BracketApp/current_season.html',context=dict)
 
-def past_seasons(request):
-    players = Player.objects.all()
-    shows = Season.objects.order_by('show')
-    seasons = {}
-    for show in shows:
-        seasons[show] = Season.objects.filter(current_season__exact=False,show__name__exact=show).order_by('subtitle')
-    dict = {'players':players,'shows':shows,'seasons':seasons}
-    return render(request,'BracketApp/past_seasons.html',context=dict)
+# def past_seasons(request):
+#     players = Player.objects.all()
+#     shows = Season.objects.order_by('show')
+#     seasons = {}
+#     for show in shows:
+#         seasons[show] = Season.objects.filter(current_season__exact=False,show__name__exact=show).order_by('subtitle')
+#     dict = {'players':players,'shows':shows,'seasons':seasons}
+#     return render(request,'BracketApp/past_seasons.html',context=dict)
 
 # def bracket_input_view(request):
 #     form1 = form.BracketInput()
@@ -90,7 +90,28 @@ def bracket_entry(request):
 def relative(request):
     return render(request,'BracketApp/relative_url_templates.html')
 
-# Class-Based Views (CBVs)
+# Class Based Views (CBVs)
+
+# class CBView(View):
+#     def get(self,request):
+#         return HttpResponse('CBVs are dopeee!')
+
+class IndexView(TemplateView):
+    template_name = 'BracketApp/BracketApp_index.html'
+
+    # def get_context_data(self,**kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['injectme'] = 'BASIC INJECTION!'
+    #     return context
+
+class SeasonListView(ListView):
+    context_object_name = 'seasons'
+    model = Season
+
+class SeasonDetailView(DetailView):
+    context_object_name = 'season_detail'
+    model = Season
+    template_name = 'BracketApp/season_detail.html'
 
 class PlayerCreateView(CreateView):
     fields = ('name',)
@@ -102,4 +123,4 @@ class PlayerUpdateView(UpdateView):
 
 class PlayerDeleteView(DeleteView):
     model = Player
-    success_url = reverse_lazy('BracketApp:past_seasons')
+    success_url = reverse_lazy('BracketApp:seasons')
