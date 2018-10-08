@@ -1,6 +1,8 @@
+import django
 from django.db import models
 # from django_pandas.managers import DataFrameManager
-from datetime import datetime
+# from datetime import datetime
+from django.urls import reverse
 
 # Create your models here.
 class Show(models.Model):
@@ -9,10 +11,13 @@ class Show(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+
 class Season(models.Model):
     show = models.ForeignKey(Show, default=69, on_delete=models.PROTECT)
     subtitle = models.CharField(max_length=69,default='David vs. Goliath')
-    #premiere = models.DateField(default = datetime.now())
+    premiere = models.DateField(default = django.utils.timezone.now)
     current_elimination = models.PositiveIntegerField(default=0)
     current_season = models.BooleanField(default=False)
     first_scored_elimination = models.PositiveIntegerField(default=1)
@@ -20,8 +25,12 @@ class Season(models.Model):
     def __str__(self):
         return "%s: %s" % (self.show, self.subtitle)
 
+    class Meta:
+        ordering = ['show','-premiere']
+
 class Player(models.Model):
     name = models.CharField(max_length=69,default='John Snow')
+    season = models.ManyToManyField(Season)
     # first_name = models.CharField(max_length=69,default='John')
     # last_name = models.CharField(max_length=69,default='Snow')
 
@@ -29,8 +38,15 @@ class Player(models.Model):
         return self.name
         # return "%s %s" % (self.first_name, self.last_name)
 
+    def get_absolute_url(self):
+        return reverse('BracketApp:current_season')
+        # return reverse('BracketApp:current_season',kwargs={'pk':self.pk})
+
+    class Meta:
+        ordering = ['name']
+
 class Contestant(models.Model):
-    season = models.ForeignKey(Season,default=69,on_delete=models.PROTECT)
+    season = models.ForeignKey(Season,on_delete=models.PROTECT,related_name='contestants')
     first_name = models.CharField(max_length=69,default='John')
     last_name = models.CharField(max_length=69,default='Snow')
     shameful_exit = models.BooleanField(default=False)
@@ -45,8 +61,11 @@ class Contestant(models.Model):
 
 #     objects = DataFrameManager()
 
+    class Meta:
+        ordering = ['season','actual_rank']
+
 class Bracket(models.Model):
-    season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
+    season = models.ForeignKey(Season, on_delete=models.PROTECT)
     player = models.ForeignKey(Player, on_delete=models.PROTECT)
     contestant = models.ForeignKey(Contestant, on_delete=models.PROTECT)
     predicted_rank = models.PositiveIntegerField(default=0)
@@ -56,6 +75,9 @@ class Bracket(models.Model):
         return "%s, %s, %s" % (self.player, self.contestant, self.predicted_elimination)
 
 #     objects = DataFrameManager()
+
+    class Meta:
+        ordering = ['season','player','predicted_rank']
 
 class Score(models.Model):
     season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
@@ -69,6 +91,9 @@ class Score(models.Model):
     def __str__(self):
         return "%s" % (self.player)
 
+    class Meta:
+        ordering = ['season','player','elimination']
+
 class Bonus(models.Model):
     season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
     player = models.ForeignKey(Player, on_delete=models.PROTECT)
@@ -78,3 +103,7 @@ class Bonus(models.Model):
 
     def __str__(self):
         return "%s, %s" % (self.season,self.player)
+
+    class Meta:
+        ordering = ['season','player']
+        verbose_name_plural = 'Bonuses'

@@ -9,18 +9,24 @@ class ShowAdmin(admin.ModelAdmin):
     # list_editable = ['name']
 
 class SeasonAdmin(admin.ModelAdmin):
-    fields = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
+    fields = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination']
     search_fields = ['show__name','subtitle']
     list_filter = ['show']
-    list_display = ['show','subtitle','current_season','first_scored_elimination','current_elimination']
+    list_display = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination','players']
     list_editable = ['current_season','current_elimination']
 
+    def players(self,obj):
+         return ", ".join([player.name for player in obj.player_set.all()])
+
 class PlayerAdmin(admin.ModelAdmin):
-    fields = ['name']
-    # search_fields = ['name']
-    # list_filter = ['name']
-    # list_display = ['name']
+    fields = ['season','name']
+    search_fields = ['name']
+    list_filter = ['season']
+    list_display = ['name','seasons']
     # list_editable = ['name']
+
+    def seasons(self, obj):
+        return ", ".join([season.subtitle for season in obj.season.all()])
 
 class ContestantAdmin(admin.ModelAdmin):
     fields = ['season','first_name','last_name','actual_rank','actual_elimination','num_confessionals','num_individual_immunity_wins','num_votes_against','shameful_exit']
@@ -32,9 +38,9 @@ class ContestantAdmin(admin.ModelAdmin):
 class BracketAdmin(admin.ModelAdmin):
     fields = ['season','player','contestant','predicted_rank','predicted_elimination']
     search_fields = ['season__name','player__name','contestant']
-    list_filter = ['season','player','predicted_rank','predicted_elimination']
+    list_filter = ['season','player','predicted_rank']
     list_display = ['season','player','contestant','predicted_rank','predicted_elimination']
-    list_editable = ['contestant','predicted_rank','predicted_elimination']
+    list_editable = ['contestant','predicted_rank']
 
 class ScoreAdmin(admin.ModelAdmin):
     fields = ['season','player','elimination','rank','cum_score','points_back','score']

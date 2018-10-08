@@ -1,0 +1,12 @@
+{% extends "BracketApp/BracketApp_base.html" %}
+
+  {% load staticfiles %}
+
+  {% block body_block %}
+    <h1>Delete {{player.name}}?
+    <form method="post">
+      {% csrf_token %}
+      <input type="submit" class="btn btn-danger" value="Danger">
+      <a href="{% url 'BracketApp:past_seasons' %}">Cancel</a>
+    </form>
+  {% endblock %}
