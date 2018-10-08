@@ -37,7 +37,7 @@ def current_season(request):
     for i in np.arange(num_eliminations)+1:
         brackets[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
-    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank')
+    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     dict = {'season':season,'players':players,'brackets':brackets,'cur_boots':cur_boots,'bonus':bonus,
         'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
     return render(request,'BracketApp/current_season.html',context=dict)

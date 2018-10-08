@@ -87,6 +87,7 @@ class Score(models.Model):
     cum_score = models.IntegerField(default=0)
     rank = models.PositiveIntegerField(default=0)
     points_back = models.PositiveIntegerField(default=0)
+    maximum_points_remaining = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return "%s" % (self.player)
