@@ -30,7 +30,8 @@
           <th>Player</th>
           <th>Place</th>
           <th>Cumulative Score</th>
-          <th>Points Back from Leader</th>
+          <th>Points Behind Leader</th>
+          <th>Maximum Points Left to Be Earned</th>
         </thead>
         {% for entry in cur_scores %}
           <tr>
@@ -38,6 +39,7 @@
             <td>{{entry.rank}}</td>
             <td>{{entry.cum_score}}</td>
             <td>{{entry.points_back}}</td>
+            <td>{{entry.maximum_points_remaining}}</td>
           </tr>
         {% endfor %}
       </table>
@@ -184,9 +186,15 @@
             {% endfor %}
           </tr>
           <tr>
-            <td><b>Points Back from Leader</b></td>
+            <td><b>Points Behind Leader</b></td>
             {% for score in value %}
               <td>{{ score.points_back }}</td>
+            {% endfor %}
+          </tr>
+          <tr>
+            <td><b>Maximum Points Left to Be Earned</b></td>
+            {% for score in value %}
+              <td>{{ score.maximum_points_remaining }}</td>
             {% endfor %}
           </tr>
         </table>

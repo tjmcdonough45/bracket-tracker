@@ -30,7 +30,8 @@ def score():
     num_eliminations = len(df_contestant['contestant'].unique())-1
 
     players=df_bracket['player'].unique()
-    stats = ['score','cum_score','rank','points_back']
+    # print(players)
+    stats = ['score','cum_score','rank','points_back','maximum_points_remaining']
     columns = pd.MultiIndex.from_product([np.arange(first_scored_elimination,cur_elimination+1), stats])
     df_score = pd.DataFrame(np.zeros((len(players),(cur_elimination-first_scored_elimination+1)*len(stats)),dtype=int),index=players,columns=columns)
 
@@ -47,12 +48,19 @@ def score():
         #score N points per player correctly guessed to survive Nth scoring elimination
         df3 = df2[df2['actual_elimination']<=first_scored_elimination]
         df2['num_eliminations_survived'] = df2[['predicted_elimination','actual_elimination']].min(axis=1)-1
+        test2=0
+        # print(label,'\n')
         for i in np.arange(first_scored_elimination,cur_elimination+1):
             test = (df2['num_eliminations_survived']>=i)*(i-first_scored_elimination+1)
             if i == shame:
                 df_score.loc[label,(i,'score')] = test.sum()-30 #30 point deduction for a winner pick having a shameful exit in the given elimination
             else:
                 df_score.loc[label,(i,'score')] = test.sum()
+            for j in np.arange(cur_elimination+1,num_eliminations+1):
+                test = (df2['num_eliminations_survived']>=j)*(j-first_scored_elimination+1)
+                # print(i,j,test.sum(),'\n')
+                test2 = test2+test.sum()
+            df_score.loc[label,(i,'maximum_points_remaining')] = test2
 
     #score 40 bonus points per correct answer to bonus questions
     if cur_elimination==num_eliminations:
@@ -98,7 +106,7 @@ def score():
     s = Season.objects.get(current_season=True)
     for dict in dict_score:
         p = Player.objects.get(name=dict['player'])
-        Score.objects.update_or_create(season=s,player=p,elimination=dict['elimination'],score=dict['score'],cum_score=dict['cum_score'],rank=dict['rank'],points_back=dict['points_back'])
+        Score.objects.update_or_create(season=s,player=p,elimination=dict['elimination'],score=dict['score'],cum_score=dict['cum_score'],rank=dict['rank'],points_back=dict['points_back'],maximum_points_remaining=dict['maximum_points_remaining'])
     # Score.objects.bulk_create(Score(**vals) for vals in dict_score)
 
     # @transaction.commit_manually

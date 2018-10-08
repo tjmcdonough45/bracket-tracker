@@ -6,7 +6,7 @@
     <h1>Delete {{player.name}}?
     <form method="post">
       {% csrf_token %}
-      <input type="submit" class="btn btn-danger" value="Danger">
+      <input type="submit" class="btn btn-danger" value="Danger" disabled>
       <a href="{% url 'BracketApp:past_seasons' %}">Cancel</a>
     </form>
   {% endblock %}
