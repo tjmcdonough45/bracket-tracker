@@ -46,19 +46,23 @@ def score():
             shame = 0
 
         #score N points per player correctly guessed to survive Nth scoring elimination
-        df3 = df2[df2['actual_elimination']<=first_scored_elimination]
+        # df3 = df2[df2['actual_elimination']<=first_scored_elimination]
+        df2.set_index('contestant',inplace=True)
         df2['num_eliminations_survived'] = df2[['predicted_elimination','actual_elimination']].min(axis=1)-1
-        test2=0
-        # print(label,'\n')
         for i in np.arange(first_scored_elimination,cur_elimination+1):
             test = (df2['num_eliminations_survived']>=i)*(i-first_scored_elimination+1)
             if i == shame:
                 df_score.loc[label,(i,'score')] = test.sum()-30 #30 point deduction for a winner pick having a shameful exit in the given elimination
             else:
                 df_score.loc[label,(i,'score')] = test.sum()
-            for j in np.arange(cur_elimination+1,num_eliminations+1):
-                test = (df2['num_eliminations_survived']>=j)*(j-first_scored_elimination+1)
-                # print(i,j,test.sum(),'\n')
+            test2=0
+            df2['num_eliminations_survived_temp'] = df2['num_eliminations_survived']
+            check = df2[df2['num_eliminations_survived_temp']>=i]
+            df2['num_eliminations_survived_temp'] = check['predicted_elimination']-1
+            for j in np.arange(i+1,num_eliminations+1):
+                test = (df2['num_eliminations_survived_temp']>=j)*(j-first_scored_elimination+1)
+                # if label == 'Tom' and i == 3:
+                #     print(label,i,j,'\n',test,'\n')
                 test2 = test2+test.sum()
             df_score.loc[label,(i,'maximum_points_remaining')] = test2
 
@@ -92,7 +96,8 @@ def score():
     df_score.loc[:, idx[:, 'rank']] = test2
     df_score.loc[:, idx[:, 'points_back']] = test3
 
-    # print(df_score,'\n')
+    # for i in np.arange(2,6):
+    #     print(i,'\n',df_score.loc[:,(i,'maximum_points_remaining')],'\n')
 
     df_score = df_score.stack(level=0).reset_index().rename(index=str,columns={'level_0':'player','level_1':'elimination'})
 
