@@ -19,6 +19,10 @@ img{
   background-color: red;
 }
 
+.bonus_win {
+  background-color: green;
+}
+
 th,td{
     text-align: center;
 }

@@ -2,12 +2,13 @@ from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
+from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score,Bonus
 from BracketApp import form
 from BracketApp.form import PlayerInput,BracketInput
 import numpy as np
 from django.views.generic import View,TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
+from itertools import chain
 
 # Create your views here.
 
@@ -37,9 +38,18 @@ def current_season(request):
     for i in np.arange(num_eliminations)+1:
         brackets[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
+    bonus_picks = Bonus.objects.all()
     cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
+
+    most_confessionals = contestants.order_by('-num_confessionals').first()
+    most_individual_immunity_wins = contestants.order_by('-num_individual_immunity_wins').first()
+    most_votes_against = contestants.order_by('-num_votes_against').first()
+
     dict = {'season':season,'players':players,'brackets':brackets,'cur_boots':cur_boots,'bonus':bonus,
-        'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds}
+        'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
+        'bonus_picks':bonus_picks,'most_confessionals':most_confessionals,'most_individual_immunity_wins':most_individual_immunity_wins,
+        'most_votes_against':most_votes_against}
+
     return render(request,'BracketApp/current_season.html',context=dict)
 
 # def past_seasons(request):

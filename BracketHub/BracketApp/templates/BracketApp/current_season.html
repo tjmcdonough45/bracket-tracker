@@ -50,6 +50,50 @@
 
   <p></p>
 
+  <div class="bonus_picks">
+    <h1>BONUS PICKS</h1>
+    {% if bonus_picks and most_confessionals and most_individual_immunity_wins and most_votes_against %}
+      <table class="table table-hover">
+        <thead>
+          <th>Player</th>
+          <th>Confessionals</th>
+          <th>Individual Immunity Wins</th>
+          <th>Votes Against</th>
+        </thead>
+        {% for entry in bonus_picks %}
+          <tr>
+            <td>{{entry.player}}</td>
+            <td>
+              {% if entry.most_confessionals.last_name in most_confessionals.last_name %}
+              <div class="bonus_win">
+              {% endif %}
+                {{entry.most_confessionals}}
+              </div>
+            </td>
+            <td>
+              {% if entry.most_individual_immunity_wins.last_name in most_individual_immunity_wins.last_name %}
+              <div class="bonus_win">
+              {% endif %}
+                {{entry.most_individual_immunity_wins}}
+              </div>
+            </td>
+            <td>
+              {% if entry.most_votes_against.last_name in most_votes_against.last_name %}
+              <div class="bonus_win">
+              {% endif %}
+                {{entry.most_votes_against}}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO BONUS PICKS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
   <div class="results">
     <h1>ELIMINATED CONTESTANTS</h1>
     {% if cur_boots %}
