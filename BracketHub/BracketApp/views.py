@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
 from BracketApp import form
-from BracketApp.form import PlayerInput,BracketInput
+from BracketApp.form import PlayerForm,BracketFormSet
 import numpy as np
 from django.views.generic import View,TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
 from django.urls import reverse_lazy
@@ -114,8 +114,76 @@ class SeasonDetailView(DetailView):
     template_name = 'BracketApp/season_detail.html'
 
 class PlayerCreateView(CreateView):
-    fields = ('name',)
+    # fields = ('name',)
     model = Player
+    template_name = 'BracketApp/form.html'
+    form_class = PlayerForm
+    object = None
+
+    def get(self,request,*args,**kwargs):
+        """
+        Handles GET requests and instantiates blank versions of the form
+        and its inline formsets.
+        """
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        bracket_form = BracketFormSet()
+        return self.render_to_response(self.get_context_data(form=form,bracket_form=bracket_form))
+
+    def post(self,request,*args,**kwargs):
+        """
+        Handles POST requests, instantiating a form instance and its inline
+        formsets with the passed POST variables and then checking them for
+        validity.
+        """
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        bracket_form = BracketFormSet(self.request.post)
+        if form.is_valid() and bracket_form.is_valid():
+            return self.form_valid(form,bracket_form)
+        else:
+            return self.form_invalid(form,bracket_form)
+
+    def form_valid(self, form, bracket_form):
+        """
+        Called if all forms are valid. Creates Player instance along with the
+        associated Bracket instances then redirects to success url
+        Args:
+            form: Player Form
+            bracket_form: Bracket Form
+
+        Returns: an HttpResponse to success url
+
+        """
+        self.object = form.save(commit=False)
+        # pre-processing for Player instance here...
+        self.object.save()
+
+        # saving Bracket Instances
+        brackets = bracket_form.save(commit=False)
+        for br in brackets:
+            #  change the Bracket instance values here
+            #  br.some_field = some_value
+            br.save()
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form, bracket_form):
+        """
+        Called if a form is invalid. Re-renders the context data with the
+        data-filled forms and errors.
+
+        Args:
+            form: Player Form
+            bracket_form: Bracket Form
+        """
+        return self.render_to_response(
+                 self.get_context_data(form=form,
+                                       bracket_form=bracket_form
+                                       )
+        )
 
 class PlayerUpdateView(UpdateView):
     fields = ('name',)

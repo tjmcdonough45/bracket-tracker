@@ -1,17 +1,32 @@
 from django import forms
+from django.forms.models import inlineformset_factory
 from django.core import validators
 from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
 
-class PlayerInput(forms.ModelForm):
+class PlayerForm(forms.ModelForm):
     #Define fields here if want to do custom validators
     class Meta():
         model = Player
         fields = '__all__'
 
-class BracketInput(forms.ModelForm):
-    class Meta():
-        model = Bracket
-        exclude = ('player',)
+# class BracketInput(forms.ModelForm):
+#     class Meta():
+#         model = Bracket
+#         exclude = ('player',)
+
+BracketFormSet = inlineformset_factory(Player, #parent form
+                                        Bracket, #inline form
+                                        fields=['contestant','predicted_elimination'], #inline form fields
+                                        labels={ #labels for the fields
+                                            'contestant':'Contestant',
+                                            'predicted_elimination':'Predicted Elimination',
+                                        },
+                                        help_texts={ #help texts for the fields
+                                            'contestant': None,
+                                            'predicted_elimination': None,
+                                        },
+                                        can_delete=False, #set to false because can't delete a non-existent instance
+                                        extra=20) #how many inline forms are in template by default
 
 # Add custom validator (as below) by inserting validators=[function_name] into Field argument
 # def check_for_z(value):
