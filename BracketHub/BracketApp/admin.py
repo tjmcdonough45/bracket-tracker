@@ -1,5 +1,5 @@
 from django.contrib import admin
-from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score,Bonus
+from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score,Bonus,UserProfileInfo
 
 class ShowAdmin(admin.ModelAdmin):
     fields = ['name']
@@ -63,3 +63,4 @@ admin.site.register(Contestant,ContestantAdmin)
 admin.site.register(Bracket,BracketAdmin)
 admin.site.register(Score,ScoreAdmin)
 admin.site.register(Bonus,BonusAdmin)
+admin.site.register(UserProfileInfo)
