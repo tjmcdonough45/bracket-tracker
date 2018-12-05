@@ -12,5 +12,9 @@ urlpatterns = [
     path('create/',views.PlayerCreateView.as_view(),name='create'),
     path('update/<int:pk>/',views.PlayerUpdateView.as_view(),name='update'),
     path('delete/<int:pk>/',views.PlayerDeleteView.as_view(),name='delete'),
+    path('register/',views.register,name='register'),
+    path('user_login/',views.user_login,name='user_login'),
+    path('logout/',views.user_logout,name='logout'),
+    path('special/',views.special,name='special'),
     path('help/', views.help, name='help'),
 ]
