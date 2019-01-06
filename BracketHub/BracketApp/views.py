@@ -24,9 +24,10 @@ def help(request):
 def current_season(request):
     season = Season.objects.filter(current_season__exact=True)
     cur_elimination = season.values()[0]['current_elimination']
+    first_scored_elimination = season.values()[0]['first_scored_elimination']
     # cur_elimination = season.current_elimination
-    cur_scoring_round = cur_elimination-1
-    players = Player.objects.order_by('name')
+    cur_scoring_round = cur_elimination-first_scored_elimination+1
+    players = Player.objects.filter(season__current_season__exact=True)
     contestants = Contestant.objects.filter(season__current_season__exact=True)
     num_eliminations = len(contestants.values_list('last_name',flat=True))-1
     num_scoring_rounds = num_eliminations-1
@@ -35,7 +36,7 @@ def current_season(request):
     scores = {}
     for player in players:
         # brackets[player] = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
-        scores[player] = Score.objects.filter(season__current_season__exact=True,player__exact=player).order_by('elimination')
+        scores[player] = Score.objects.filter(player__exact=player).order_by('elimination')
     for i in np.arange(num_eliminations)+1:
         brackets[i] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
@@ -142,7 +143,7 @@ class PlayerCreateView(CreateView):
         self.object = None
         form_class = self.get_form_class()
         form = self.get_form(form_class)
-        bracket_form = BracketFormSet(self.request.post)
+        bracket_form = BracketFormSet(self.request.POST)
         if form.is_valid() and bracket_form.is_valid():
             return self.form_valid(form,bracket_form)
         else:

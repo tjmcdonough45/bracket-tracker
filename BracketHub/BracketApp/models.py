@@ -7,13 +7,16 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class UserProfileInfo(models.Model):
-    user = models.OneToOneField(User,on_delete=models.PROTECT) #contains fields in default Django user model: username, e-mail, first_name, last_name, date_joined, last_login; permission-related fields: password, is_superuser, is_staff, is_active
+    user = models.OneToOneField(User,default=1,on_delete=models.PROTECT) #contains fields in default Django user model: username, e-mail, first_name, last_name, date_joined, last_login; permission-related fields: password, is_superuser, is_staff, is_active
 
     #additional fields
     profile_pic = models.ImageField(upload_to='BracketApp/profile_pics',blank=True)
 
     def __str__(self):
         return self.user.username
+
+    class Meta:
+        verbose_name_plural = 'UserProfileInfo'
 
 class Show(models.Model):
     name = models.CharField(max_length=69,default='Survivor')
@@ -25,7 +28,7 @@ class Show(models.Model):
         ordering = ['name']
 
 class Season(models.Model):
-    show = models.ForeignKey(Show, default=69, on_delete=models.PROTECT)
+    show = models.ForeignKey(Show,default=1,on_delete=models.PROTECT)
     subtitle = models.CharField(max_length=69,default='David vs. Goliath')
     premiere = models.DateField(default = django.utils.timezone.now)
     current_elimination = models.PositiveIntegerField(default=0)
@@ -39,14 +42,14 @@ class Season(models.Model):
         ordering = ['show','-premiere']
 
 class Player(models.Model):
+    user = models.ForeignKey(UserProfileInfo,default=1,on_delete=models.PROTECT)
+    season = models.ForeignKey(Season,default=1,on_delete=models.PROTECT)
     name = models.CharField(max_length=69,default='John Snow')
-    season = models.ManyToManyField(Season)
     # first_name = models.CharField(max_length=69,default='John')
     # last_name = models.CharField(max_length=69,default='Snow')
 
     def __str__(self):
-        return self.name
-        # return "%s %s" % (self.first_name, self.last_name)
+        return "%s (%s, %s)" % (self.name,self.season,self.user)
 
     def get_absolute_url(self):
         return reverse('BracketApp:current_season')
@@ -56,7 +59,7 @@ class Player(models.Model):
         ordering = ['name']
 
 class Contestant(models.Model):
-    season = models.ForeignKey(Season,on_delete=models.PROTECT,related_name='contestants')
+    season = models.ForeignKey(Season,default=1,on_delete=models.PROTECT,related_name='contestants')
     first_name = models.CharField(max_length=69,default='John')
     last_name = models.CharField(max_length=69,default='Snow')
     shameful_exit = models.BooleanField(default=False)
@@ -67,7 +70,7 @@ class Contestant(models.Model):
     num_votes_against = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
+        return "%s %s (%s)" % (self.first_name, self.last_name, self.season)
 
 #     objects = DataFrameManager()
 
@@ -75,9 +78,8 @@ class Contestant(models.Model):
         ordering = ['season','actual_rank']
 
 class Bracket(models.Model):
-    season = models.ForeignKey(Season, on_delete=models.PROTECT)
-    player = models.ForeignKey(Player, on_delete=models.PROTECT)
-    contestant = models.ForeignKey(Contestant, on_delete=models.PROTECT)
+    player = models.ForeignKey(Player,default=1,on_delete=models.PROTECT)
+    contestant = models.ForeignKey(Contestant,default=1,on_delete=models.PROTECT)
     predicted_rank = models.PositiveIntegerField(default=0)
     predicted_elimination = models.PositiveIntegerField(default=0)
 
@@ -87,11 +89,10 @@ class Bracket(models.Model):
 #     objects = DataFrameManager()
 
     class Meta:
-        ordering = ['season','player','predicted_rank']
+        ordering = ['player','predicted_rank']
 
 class Score(models.Model):
-    season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
-    player = models.ForeignKey(Player,on_delete=models.PROTECT)
+    player = models.ForeignKey(Player,default=1,on_delete=models.PROTECT)
     elimination = models.PositiveIntegerField(default=0)
     score = models.IntegerField(default=0)
     cum_score = models.IntegerField(default=0)
@@ -100,21 +101,20 @@ class Score(models.Model):
     maximum_points_remaining = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "%s" % (self.player)
+        return "%s, %s, %s" % (self.player, self.elimination, self.cum_score)
 
     class Meta:
-        ordering = ['season','player','elimination']
+        ordering = ['player','elimination']
 
 class Bonus(models.Model):
-    season = models.ForeignKey(Season, default=69, on_delete=models.PROTECT)
-    player = models.ForeignKey(Player, on_delete=models.PROTECT)
-    most_confessionals = models.ForeignKey(Contestant, related_name='q1', on_delete=models.PROTECT)
-    most_individual_immunity_wins = models.ForeignKey(Contestant, related_name='q2', on_delete=models.PROTECT)
-    most_votes_against = models.ForeignKey(Contestant, related_name='q3', on_delete=models.PROTECT)
+    player = models.ForeignKey(Player, default=1,on_delete=models.PROTECT)
+    most_confessionals = models.ForeignKey(Contestant, default=1, related_name='q1', on_delete=models.PROTECT)
+    most_individual_immunity_wins = models.ForeignKey(Contestant, default=1, related_name='q2', on_delete=models.PROTECT)
+    most_votes_against = models.ForeignKey(Contestant, default=1, related_name='q3', on_delete=models.PROTECT)
 
     def __str__(self):
-        return "%s, %s" % (self.season,self.player)
+        return "%s, c: %s, ii: %s, va: %s" % (self.player, self.most_confessionals,self.most_individual_immunity_wins,self.most_votes_against)
 
     class Meta:
-        ordering = ['season','player']
+        ordering = ['player']
         verbose_name_plural = 'Bonuses'

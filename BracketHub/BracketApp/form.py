@@ -15,7 +15,7 @@ class PlayerForm(forms.ModelForm):
 #         exclude = ('player',)
 
 BracketFormSet = inlineformset_factory(Player, #parent form
-                                        Bracket, #inline form
+                                        Bracket, #inline form model
                                         fields=['contestant','predicted_elimination'], #inline form fields
                                         labels={ #labels for the fields
                                             'contestant':'Contestant',

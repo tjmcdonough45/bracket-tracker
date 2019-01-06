@@ -9,10 +9,11 @@
     {{ bracket_form.as_p }} -->
     {% csrf_token %}
     <fieldset>
+      <legend>Player Info</legend>
       {{ form.non_field_errors }}
       {% for field in form %}
         <div class="row">
-          <div class="col-md-3">{% bootstrap_label fieldlabel %}</div>
+          <div class="col-md-3">{% bootstrap_label field.label %}</div>
           <div class="col-md-8">{% bootstrap_field field show_label=False %}</div>
         </div>
       {% endfor %}
@@ -31,6 +32,13 @@
             {% endfor %}
           </div>
         {% endfor %}
+    </fieldset>
+    <fieldset>
+      <div class="row">
+        <div class="col-md-1">
+          <input type="submit" class="btn btn-primary" value="Submit">
+        </div>
+      </div>
     </fieldset>
   </form>
   {% endblock %}
