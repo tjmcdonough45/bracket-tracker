@@ -2,14 +2,22 @@
   {% load staticfiles %}
   {% block body_block %}
   <div class="jumbotron">
-    <h1>Season Details:</h1>
-    <p>{{season_detail.show}} {{season_detail.subtitle}}</p>
-    <p>{{season_detail.premiere}}</p>
-    <p>{{season_detail.current_season}}</p>
-    <p>{{season_detail.player_set}}</p>
-    <h3>Contestants:</h3>
-    {% for contestant in season_detail.contestants.all %}
-      <p>{{contestant.first_name}} {{contestant.last_name}}</p>
-    {% endfor %}
+    <h1>{{season_detail.show}}: {{season_detail.subtitle}}</h1>
+    <p><b>Premiere Date:</b> {{season_detail.premiere}}</p>
+    <p><b>Current Season?</b> {{season_detail.current_season}}</p>
+    <p>{{season_detail.players}}</p>
+
+    <table class="table table-hover">
+      <thead>
+        <th>Contestant</th>
+        <th>Finish</th>
+      </thead>
+      {% for contestant in season_detail.contestants.all %}
+        <tr>
+          <td>{{contestant.first_name}} {{contestant.last_name}}</td>
+          <td>{{contestant.actual_rank}}</td>
+        </tr>
+      {% endfor %}
+    </table>
   </div>
   {% endblock %}

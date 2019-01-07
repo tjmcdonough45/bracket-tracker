@@ -2,9 +2,10 @@
 {% block body_block %}
   <div class="container">
     <div class="jumbotron">
-      <h1>Please Login</h1>
+      <h1>Please log in</h1>
+      <p></p>
 
-        <form method="post" action="{% url 'BracketApp:user_login' %}">
+        <form method="POST" action="{% url 'BracketApp:user_login' %}">
           {% csrf_token %}
           {# A more "HTML" way of creating the login form#}
           <label for="username">Username:</label>
@@ -13,7 +14,7 @@
           <label for="password">Password:</label>
           <input type="password" name="password">
 
-          <input type="submit" name="" value="Login">
+          <input type="submit" class="btn btn-primary" value="Login">
 
         </form>
 

@@ -1,10 +1,10 @@
 {% extends "BracketApp/BracketApp_base.html" %}
 
-  {% load staticfiles %}
+  {% load static %}
 
   {% block body_block %}
 
-  <script type="text/javascript">
+  <!-- <script type="text/javascript">
     var cell = $('td');
 
     cell.each(function() { //loop through all td elements ie the cells
@@ -14,10 +14,9 @@
       if (cell_value == 'Jessica Peet') //if then for if value is 1
         $(this).css({'background' : 'red'});   // changes td to red.
     });
-  </script>
+  </script> -->
 
-  <img src="{% static "BracketApp/images/logo.png" %}" alt="That sucks!">
-
+  <!-- <img src="BracketHub/media/BracketApp/season_pics/arie.jpg" alt="That sucks!"> -->
   <div class="cur_scores">
     {% if season and cur_scoring_round and num_scoring_rounds %}
       {% for entry in season %}
@@ -50,49 +49,25 @@
 
   <p></p>
 
-  <div class="results">
-    <h1>ELIMINATED CONTESTANTS</h1>
-    {% if cur_boots %}
-      <table class="table table-hover">
-        <thead>
-          <th>Finish</th>
-          <th>Contestant</th>
-          <th>Shameful Exit?</th>
-        </thead>
-        {% for entry in cur_boots %}
-          <tr>
-            <td>{{entry.actual_rank}}</td>
-            <td>{{entry.first_name}} {{entry.last_name}}</td>
-            <td>{{entry.shameful_exit}}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>NO BOOTS!</p>
-    {% endif %}
-  </div>
-
-  <p></p>
-
   <div class="brackets">
     <h1>BRACKETS</h1>
-    {% if brackets and cur_boots%}
+    {% if brackets %}
     <table class="table table-hover">
       <thead>
-        <th>Place</th>
-          {% for player in players %}
-            <th>{{player.name}}</th>
+        <th>Finish</th>
+          {% for rank in ranks %}
+            <th>{{rank}}</th>
           {% endfor %}
       </thead>
       {% for key,value in brackets.items %}
         <tr>
-          <td>{{key}}</td>
+          <td><b>{{key.name}}</b></td>
           {% for bracket in value %}
             <td>
               {% if bracket.contestant in cur_boots %}
               <div class="boot">
               {% endif %}
-                {{bracket.contestant}}
+                {{bracket.contestant.first_name}} {{bracket.contestant.last_name}}
               </div>
             </td>
           {% endfor %}
@@ -106,7 +81,31 @@
 
   <p></p>
 
-  <div class="bonus">
+  <div class="results">
+    <h1>ELIMINATED CONTESTANTS</h1>
+    {% if cur_boots %}
+      <table class="table table-hover">
+        <thead>
+          <th>Finish</th>
+          <th>Contestant</th>
+          <!-- <th>Shameful Exit?</th> -->
+        </thead>
+        {% for entry in cur_boots %}
+          <tr>
+            <td>{{entry.actual_rank}}</td>
+            <td>{{entry.first_name}} {{entry.last_name}}</td>
+            <!-- <td>{{entry.shameful_exit}}</td> -->
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO BOOTS!</p>
+    {% endif %}
+  </div>
+
+  <p></p>
+
+  <!-- <div class="bonus">
     <h1>BONUS CATEGORIES</h1>
     {% if bonus %}
       <table class="table table-hover">
@@ -128,7 +127,7 @@
     {% else %}
       <p>NO BONUS!</p>
     {% endif %}
-  </div>
+  </div> -->
 
   <!--<div class="brackets">-->
   <!--  <h1>BRACKETS</h1>-->
@@ -159,7 +158,7 @@
     <h1>FULL SCORES</h1>
     {% if scores %}
       {% for key,value in scores.items %}
-        <h2>{{ key }}</h2>
+        <h2>{{ key.name }}</h2>
         <table class="table table-hover">
           <tr>
             <td><b>Elimination</b></td>
@@ -203,5 +202,4 @@
       <p>NO SCORES!</p>
     {% endif %}
   </div>
-
   {% endblock %}

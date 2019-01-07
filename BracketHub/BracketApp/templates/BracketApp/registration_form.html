@@ -2,16 +2,16 @@
   {% block body_block %}
   <div class="jumbotron">
     {% if registered %}
-      <h1>Thank you for registering!</h1>
+      <h1>Thank you for registering! Now you can log in to submit a bracket.</h1>
     {% else %}
       <h1>Register here!</h1>
-      <h3>Fill out the form:</h3>
+      <h3>Username and password are required</h3>
 
-      <form enctype="multipart/form-data" method="post">
+      <form method="POST">
         {% csrf_token %}
         {{ user_form.as_p }}
         {{ profile_form.as_p }}
-        <input type="submit" name="" value="Register">
+        <input type="submit" class="btn btn-primary" value="Register">
       </form>
     {% endif %}
   </div>

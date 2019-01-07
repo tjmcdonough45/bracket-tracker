@@ -23,6 +23,10 @@ th,td{
     text-align: center;
 }
 
+.display,.display-1{
+  text-align: center;
+}
+
 /* table{
   border-collapse: collapse;
   width:50%;
