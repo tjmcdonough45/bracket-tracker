@@ -7,26 +7,55 @@ class PlayerForm(forms.ModelForm):
     #Define fields here if want to do custom validators
     class Meta():
         model = Player
-        fields = '__all__'
+        fields = ('name',)
+        help_texts = {
+            'name': "Alias under which you'd like to submit your bracket"
+        }
+        # widgets = {
+        #     'user': forms.TextInput(attrs={'readonly': 'readonly'}), #make user field read-only; set to current user in view
+        #     'season': forms.TextInput(attrs={'readonly': 'readonly'}), #make season field read-only; set to current season in view
+        # }
 
 # class BracketInput(forms.ModelForm):
 #     class Meta():
 #         model = Bracket
 #         exclude = ('player',)
 
+contestants_pool = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
+num_contestants = len(contestants_pool.values_list())
+
+class BaseBracketFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        """Checks that no two brackets have the same contestant."""
+        if any(self.errors):
+            # Don't bother validating the formset unless each form is valid on its own
+            return
+        contestants = []
+        for form in self.forms:
+            contestant = form.cleaned_data['contestant']
+            if contestant not in contestants_pool:
+                raise forms.ValidationError("Select only contestants from the current season who have not yet been eliminated.")
+            if contestant in contestants:
+                raise forms.ValidationError("Select each contestant only once. Please review bracket and resubmit.")
+            contestants.append(contestant)
+
 BracketFormSet = inlineformset_factory(Player, #parent form
                                         Bracket, #inline form model
-                                        fields=['contestant','predicted_elimination'], #inline form fields
+                                        formset=BaseBracketFormSet,
+                                        fields=['predicted_rank','contestant'], #inline form fields
                                         labels={ #labels for the fields
                                             'contestant':'Contestant',
-                                            'predicted_elimination':'Predicted Elimination',
+                                            'predicted_rank':'Predicted Rank',
                                         },
                                         help_texts={ #help texts for the fields
                                             'contestant': None,
-                                            'predicted_elimination': None,
+                                            'predicted_rank': None,
+                                        },
+                                        widgets = {
+                                            'predicted_rank': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_rank field read-only; populate with necessary options in view
                                         },
                                         can_delete=False, #set to false because can't delete a non-existent instance
-                                        extra=20) #how many inline forms are in template by default
+                                        extra=num_contestants) #how many inline forms are in template by default
 
 # Add custom validator (as below) by inserting validators=[function_name] into Field argument
 # def check_for_z(value):

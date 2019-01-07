@@ -1,5 +1,5 @@
 from django.contrib import admin
-from BracketApp.models import UserProfileInfo,Show,Season,Player,Contestant,Bracket,Score,Bonus,UserProfileInfo
+from BracketApp.models import UserProfileInfo,Show,Season,Point,Player,Contestant,Bracket,Score,Bonus,UserProfileInfo
 
 class UserProfileInfoAdmin(admin.ModelAdmin):
     fields = ['user','profile_pic']
@@ -16,14 +16,19 @@ class ShowAdmin(admin.ModelAdmin):
     # list_editable = ['name']
 
 class SeasonAdmin(admin.ModelAdmin):
-    fields = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination']
+    fields = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination','season_pic']
     search_fields = ['show__name','subtitle']
     list_filter = ['show']
-    list_display = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination','players']
+    list_display = ['show','subtitle','premiere','current_season','first_scored_elimination','current_elimination','season_pic','players']
     list_editable = ['current_season','current_elimination']
 
     def players(self,obj):
          return ", ".join([player.name for player in obj.player_set.all()])
+
+class PointAdmin(admin.ModelAdmin):
+    fields = ['season','rank','elimination','points_per_contestant_remaining','num_boots']
+    list_display = ['season','rank','elimination','points_per_contestant_remaining','num_boots']
+    list_editable = ['rank','elimination','points_per_contestant_remaining','num_boots']
 
 class PlayerAdmin(admin.ModelAdmin):
     fields = ['user','season','name']
@@ -43,7 +48,7 @@ class BracketAdmin(admin.ModelAdmin):
     fields = ['player','contestant','predicted_rank','predicted_elimination']
     search_fields = ['player__name','contestant']
     list_filter = ['player','predicted_rank']
-    list_display = ['player','contestant','predicted_rank','predicted_elimination']
+    list_display = ['player','contestant','predicted_rank','predicted_elimination','submitted']
     list_editable = ['contestant','predicted_rank']
 
 class ScoreAdmin(admin.ModelAdmin):
@@ -63,6 +68,7 @@ class BonusAdmin(admin.ModelAdmin):
 admin.site.register(UserProfileInfo,UserProfileInfoAdmin)
 admin.site.register(Show,ShowAdmin)
 admin.site.register(Season,SeasonAdmin)
+admin.site.register(Point,PointAdmin)
 admin.site.register(Player,PlayerAdmin)
 admin.site.register(Contestant,ContestantAdmin)
 admin.site.register(Bracket,BracketAdmin)

@@ -17,7 +17,7 @@ def score():
     cur_elimination = qs_season['current_elimination']
     first_scored_elimination = qs_season['first_scored_elimination']
 
-    qs_bracket = Bracket.objects.filter(season__current_season__exact=True)
+    qs_bracket = Bracket.objects.filter(player__season__current_season__exact=True)
     df_bracket = read_frame(qs_bracket)
     # print(df_bracket.head(),'\n')
 

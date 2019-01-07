@@ -4,6 +4,8 @@ from django.db import models
 # from datetime import datetime
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 class UserProfileInfo(models.Model):
@@ -14,6 +16,12 @@ class UserProfileInfo(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    # @receiver(post_save, sender=User)
+    # def update_user_profile(sender, instance, created, **kwargs):
+    #     if created:
+    #         UserProfileInfo.objects.create(user=instance)
+    #     instance.profile.save()
 
     class Meta:
         verbose_name_plural = 'UserProfileInfo'
@@ -34,12 +42,26 @@ class Season(models.Model):
     current_elimination = models.PositiveIntegerField(default=0)
     current_season = models.BooleanField(default=False)
     first_scored_elimination = models.PositiveIntegerField(default=1)
+    season_pic = models.ImageField(upload_to='BracketApp/season_pics',blank=True)
 
     def __str__(self):
         return "%s: %s" % (self.show, self.subtitle)
 
     class Meta:
         ordering = ['show','-premiere']
+
+class Point(models.Model):
+    season = models.ForeignKey(Season,default=1,on_delete=models.PROTECT)
+    rank = models.PositiveIntegerField(default=69)
+    elimination = models.PositiveIntegerField(default=69)
+    points_per_contestant_remaining = models.PositiveIntegerField(default=0)
+    num_boots = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "%s, %s, %s, %s" % (self.season, self.elimination, self.points_per_contestant_remaining, self.num_boots)
+
+    class Meta:
+        ordering = ['elimination']
 
 class Player(models.Model):
     user = models.ForeignKey(UserProfileInfo,default=1,on_delete=models.PROTECT)
@@ -70,7 +92,8 @@ class Contestant(models.Model):
     num_votes_against = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "%s %s (%s)" % (self.first_name, self.last_name, self.season)
+        # return "%s %s (%s)" % (self.first_name, self.last_name, self.season)
+        return "%s %s" % (self.first_name, self.last_name)
 
 #     objects = DataFrameManager()
 
@@ -82,6 +105,7 @@ class Bracket(models.Model):
     contestant = models.ForeignKey(Contestant,default=1,on_delete=models.PROTECT)
     predicted_rank = models.PositiveIntegerField(default=0)
     predicted_elimination = models.PositiveIntegerField(default=0)
+    submitted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "%s, %s, %s" % (self.player, self.contestant, self.predicted_elimination)

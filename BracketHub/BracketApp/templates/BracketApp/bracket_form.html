@@ -1,0 +1,44 @@
+{% extends "BracketApp/BracketApp_base.html" %}
+  {% load i18n %}
+  {% load bootstrap4 %}
+
+  {% block body_block %}
+  <div class="jumbotron">
+    {% if submitted %}
+      <h1>Thank you for submitting a bracket!</h1>
+    {% else %}
+      <h1>Enter your bracket!</h1>
+      <form method="POST">
+        {% csrf_token %}
+        <fieldset>
+          <legend>Player</legend>
+          {{ player_form.non_field_errors }}
+    			{% for field in player_form %}
+    				<div class="row">
+    					<div class="col-md-3">{% bootstrap_label field.label %}</div>
+    					<div class="col-md-8">{% bootstrap_field field show_label=False %}</div>
+    				</div>
+    			{% endfor %}
+        </fieldset>
+
+        <fieldset>
+          <legend>Bracket</legend>
+    			{{ bracket_form.management_form }}
+    			{{ bracket_form.non_form_errors }}
+          <ol class="row">
+            {% for form in bracket_form %}
+              <li>
+                {% for field in form.visible_fields %}
+                  <div class="col-md-10">{% bootstrap_label field.label %}</div>
+                  <div class="col-md-10">{% bootstrap_field field show_label=False %}</div>
+                {% endfor %}
+              </li>
+            {% endfor %}
+          </ol>
+        </fieldset>
+
+        <input type="submit" class="btn btn-primary" value="Register">
+      </form>
+    {% endif %}
+  </div>
+  {% endblock %}
