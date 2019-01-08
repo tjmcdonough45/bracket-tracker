@@ -17,6 +17,7 @@
   </script> -->
 
   <!-- <img src="BracketHub/media/BracketApp/season_pics/arie.jpg" alt="That sucks!"> -->
+  <div class="cur">
   <div class="cur_scores">
     {% if season and cur_scoring_round and num_scoring_rounds %}
       {% for entry in season %}
@@ -201,5 +202,6 @@
     {% else %}
       <p>NO SCORES!</p>
     {% endif %}
+  </div>
   </div>
   {% endblock %}

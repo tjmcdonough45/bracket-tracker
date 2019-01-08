@@ -5,7 +5,8 @@
   {% block body_block %}
   <div class="jumbotron">
     {% if submitted %}
-      <h1>Thank you for submitting a bracket!</h1>
+      <h1 class=display>Thank you for submitting a bracket!</h1>
+      <h1 class=display>Good luck out there, tiger ;)</h1>
     {% else %}
       <h1>Enter your bracket!</h1>
       <form method="POST">
@@ -23,8 +24,13 @@
 
         <fieldset>
           <legend>Bracket</legend>
+          <ul>
+            <li>A "finish" of 1 corresponds to THE ONE and 10 corresponds to contestants eliminated at the second rose ceremony.</li>
+          </ul>
     			{{ bracket_form.management_form }}
-    			{{ bracket_form.non_form_errors }}
+          <div class="error">
+            {{ bracket_form.non_form_errors }}
+          </div>
           <ol class="row">
             {% for form in bracket_form %}
               <li>
@@ -36,8 +42,7 @@
             {% endfor %}
           </ol>
         </fieldset>
-
-        <input type="submit" class="btn btn-primary" value="Register" disabled>
+        <input type="submit" class="btn btn-primary" value="Submit">
       </form>
     {% endif %}
   </div>

@@ -33,7 +33,7 @@ def current_season(request):
     num_scoring_rounds = len(points)
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
+    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
     brackets = {}
     scores = {}
     for player in players:
@@ -302,7 +302,7 @@ def bracket_entry(request):
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     contestants = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
     num_contestants = len(contestants.values_list())
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
+    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
 
     if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season[0]).values_list())==0:
         submitted = False

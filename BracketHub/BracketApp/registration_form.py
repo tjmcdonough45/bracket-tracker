@@ -6,11 +6,13 @@ from BracketApp.models import UserProfileInfo
 class UserForm(UserCreationForm):
     #UserCreationForm typically includes username, password1, and password2 fields
     email = forms.EmailField(required=False)
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
 
     # this sets the order of the fields
     class Meta:
         model = User
-        fields = ("username", "email", "password1", "password2",)
+        fields = ("username", "first_name", "last_name", "email", "password1", "password2",)
         help_texts = {
             'email': 'Optional',
         }

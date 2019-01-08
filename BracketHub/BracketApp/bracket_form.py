@@ -9,7 +9,7 @@ class PlayerForm(forms.ModelForm):
         model = Player
         fields = ('name',)
         help_texts = {
-            'name': "Alias under which you'd like to submit your bracket"
+            'name': "The alias under which you'd like to submit your bracket. It can be the same as your username...or not! Go wild!"
         }
         # widgets = {
         #     'user': forms.TextInput(attrs={'readonly': 'readonly'}), #make user field read-only; set to current user in view
@@ -25,6 +25,12 @@ contestants_pool = Contestant.objects.filter(season__current_season__exact=True,
 num_contestants = len(contestants_pool.values_list())
 
 class BaseBracketFormSet(forms.BaseInlineFormSet):
+
+    def __init__(self, *args, **kwargs):
+        super(BaseBracketFormSet, self).__init__(*args, **kwargs)
+        for form in self:
+            form.fields['contestant'].queryset = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
+
     def clean(self):
         """Checks that no two brackets have the same contestant."""
         if any(self.errors):
@@ -36,7 +42,7 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
             if contestant not in contestants_pool:
                 raise forms.ValidationError("Select only contestants from the current season who have not yet been eliminated.")
             if contestant in contestants:
-                raise forms.ValidationError("Select each contestant only once. Please review bracket and resubmit.")
+                raise forms.ValidationError("Select each contestant only once.")
             contestants.append(contestant)
 
 BracketFormSet = inlineformset_factory(Player, #parent form
@@ -45,7 +51,7 @@ BracketFormSet = inlineformset_factory(Player, #parent form
                                         fields=['predicted_rank','contestant'], #inline form fields
                                         labels={ #labels for the fields
                                             'contestant':'Contestant',
-                                            'predicted_rank':'Predicted Rank',
+                                            'predicted_rank':'Finish',
                                         },
                                         help_texts={ #help texts for the fields
                                             'contestant': None,
