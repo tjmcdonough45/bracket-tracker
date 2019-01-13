@@ -187,9 +187,17 @@ class PlayerCreateView(CreateView):
                                        )
         )
 
-class PlayerUpdateView(UpdateView):
-    fields = ('name',)
-    model = Player
+class UserProfileInfoUpdateView(UpdateView):
+    model = UserProfileInfo
+    fields = ['profile_pic']
+    template_name = 'BracketApp/update_profile_form.html'
+
+    #Need this function or else update doesn't work beyond pk=1
+    def get_object(self,queryset=None):
+        return self.request.user.userprofileinfo
+
+    def get_success_url(self):
+        return reverse('index')
 
 class PlayerDeleteView(DeleteView):
     model = Player
