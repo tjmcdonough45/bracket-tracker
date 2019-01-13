@@ -13,15 +13,35 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'index' %}">Home</a>
         </li>
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
-        </li> -->
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:create' %}">Enter a player</a>
-        </li> -->
         <li class="nav-item">
           <a class="nav-link" href="{% url 'BracketApp:current_season' %}">Current season</a>
         </li>
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:seasons' %}">Seasons</a>
+          </li>
+          {% if user.is_staff %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:logout' %}">Log out</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:user_login' %}">Log in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:register' %}">Register</a>
+          </li>
+        {% endif %}
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
+        </li> -->
         <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Past seasons</a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -30,13 +50,7 @@
             <a class="dropdown-item" href="#">Item 2</a>
           </div>
         </li> -->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:seasons' %}">Seasons</a>
-        </li>
         <!--<li class="nav-item"><a class="nav-link" href="{% url 'BracketApp:help' %}">Help</a></li>-->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-        </li>
       </ul>
     </nav>
 

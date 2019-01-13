@@ -1,0 +1,18 @@
+{% extends "BracketApp/BracketApp_base.html" %}
+  {% block body_block %}
+  <div class="jumbotron">
+    {% if registered %}
+      <h1 class="display">Thank you for registering! Now you can log in to submit a bracket.</h1>
+    {% else %}
+      <h1>Register here!</h1>
+      <h3>Username and password are required</h3>
+
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <input type="submit" class="btn btn-primary" value="Register">
+      </form>
+    {% endif %}
+  </div>
+  {% endblock %}
