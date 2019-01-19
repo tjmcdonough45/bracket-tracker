@@ -15,17 +15,14 @@
   margin-right: 37.5%;
 } */
 
-.boot {
-  background-color: red;
-}
-
-.bonus_win {
-  background-color: green;
-}
-
 /* th,td{
     text-align: center;
 } */
+
+.table > tbody > tr > td {
+  text-align: center;
+  vertical-align: middle;
+}
 
 table{
   margin-left: auto;

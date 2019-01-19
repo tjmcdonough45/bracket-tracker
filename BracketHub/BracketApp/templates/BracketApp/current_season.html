@@ -16,7 +16,6 @@
     });
   </script> -->
 
-  <!-- <img src="BracketHub/media/BracketApp/season_pics/arie.jpg" alt="That sucks!"> -->
   <div class="cur">
   <div class="cur_scores">
     {% if season and cur_scoring_round and num_scoring_rounds %}
@@ -56,26 +55,29 @@
     <div class="table-responsive">
     <table class="table table-hover">
       <thead>
-        <th>Finish</th>
-          {% for rank in ranks %}
-            <th>{{rank}}</th>
-          {% endfor %}
+        <th colspan="2">Finish</th>
+        {% for rank in ranks %}
+          <th>{{rank}}</th>
+        {% endfor %}
       </thead>
       {% for key,value in brackets_and_pics.items %}
         <tr>
-          <td><b>{{key.name}}</b>
+          <td><b>{{key.name}}</b></td>
+          <td>
             {% if value.pic %}
-              <p><img src="{{value.pic.url}}" alt="No pic :(" style="max-height: 50px"></p>
+              <img src="{{value.pic.url}}" alt="No pic :(" style="max-height: 100px">
             {% endif %}
           </td>
           {% for bracket in value.bracket %}
-            <td>
-              {% if bracket.contestant in cur_boots %}
-              <div class="boot">
-              {% endif %}
+            {% if bracket.contestant in cur_boots %}
+              <td class="bg-danger">
                 {{bracket.contestant.first_name}} {{bracket.contestant.last_name}}
-              </div>
-            </td>
+              </td>
+            {% else %}
+              <td>
+                {{bracket.contestant.first_name}} {{bracket.contestant.last_name}}
+              </td>
+            {% endif %}
           {% endfor %}
         </tr>
       {% endfor %}
@@ -101,27 +103,24 @@
       {% for entry in bonus_picks %}
         <tr>
           <td>{{entry.player.name}}</td>
-          <td>
-            {% if entry.most_confessionals.last_name in most_confessionals.last_name %}
-            <div class="bonus_win">
-            {% endif %}
-              {{entry.most_confessionals}}
-            </div>
-          </td>
-          <td>
-            {% if entry.most_individual_immunity_wins.last_name in most_individual_immunity_wins.last_name %}
-            <div class="bonus_win">
-            {% endif %}
-              {{entry.most_individual_immunity_wins}}
-            </div>
-          </td>
-          <td>
-            {% if entry.most_votes_against.last_name in most_votes_against.last_name %}
-            <div class="bonus_win">
-            {% endif %}
-              {{entry.most_votes_against}}
-            </div>
-          </td>
+
+          {% if entry.most_confessionals.last_name in most_confessionals.last_name %}
+            <td class="bg-success">{{entry.most_confessionals}}</td>
+          {% else %}
+            <td>{{entry.most_confessionals}}</td>
+          {% endif %}
+
+          {% if entry.most_individual_immunity_wins.last_name in most_individual_immunity_wins.last_name %}
+            <td class="bg-success">{{entry.most_individual_immunity_wins}}</td>
+          {% else %}
+            <td>{{entry.most_individual_immunity_wins}}</td>
+          {% endif %}
+
+          {% if entry.most_votes_against.last_name in most_votes_against.last_name %}
+            <td class="bg-success">{{entry.most_votes_against}}</td>
+          {% else %}
+            <td>{{entry.most_votes_against}}</td>
+          {% endif %}
         </tr>
       {% endfor %}
     </table>
