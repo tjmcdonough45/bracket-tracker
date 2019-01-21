@@ -35,29 +35,32 @@ def current_season(request):
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
     predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
-    brackets = {}
+
+    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     scores = {}
     pics = {}
     brackets_and_pics = {}
+    cur_scores_and_pics = {}
     for player in players:
         bracket = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
+        # cur_score = cur_scores.filter(player__exact=player)
         scores[player] = Score.objects.filter(player__exact=player).order_by('elimination')
         pic = player.user.profile_pic
         brackets_and_pics[player] = {'bracket':bracket,'pic':pic}
+        # cur_scores_and_pics[player] = {'cur_score':cur_score,'pic':pic}
     # for i in np.arange(num_contestants)+1:
     #     brackets[points[i]] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
     bonus_picks = Bonus.objects.all()
-    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
 
     most_confessionals = contestants.order_by('-num_confessionals').first()
     most_individual_immunity_wins = contestants.order_by('-num_individual_immunity_wins').first()
     most_votes_against = contestants.order_by('-num_votes_against').first()
 
-    dict = {'season':season,'players':players,'cur_boots':cur_boots,'bonus':bonus,
-        'scores':scores,'cur_scores':cur_scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
+    dict = {'season':season,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
+        'scores':scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
         'ranks':predicted_rank_init,'bonus_picks':bonus_picks,'most_confessionals':most_confessionals,'most_individual_immunity_wins':most_individual_immunity_wins,
-        'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics}
+        'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics,'cur_scores_and_pics':cur_scores_and_pics}
     return render(request,'BracketApp/current_season.html',context=dict)
 
 # def past_seasons(request):

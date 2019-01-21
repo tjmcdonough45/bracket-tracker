@@ -17,7 +17,7 @@ def score():
     cur_elimination = qs_season['current_elimination']
     first_scored_elimination = qs_season['first_scored_elimination']
     show = Show.objects.filter(id__exact=qs_season['show_id']).values()[0]['name']
-    print(show)
+    # print(show)
 
     qs_bracket = Bracket.objects.filter(player__season__current_season__exact=True)
     df_bracket = read_frame(qs_bracket)
@@ -108,20 +108,20 @@ def score():
     df_score.loc[:, idx[:, 'rank']] = test2
     df_score.loc[:, idx[:, 'points_back']] = test3
 
-    for i in [2]:
-        print(i,'\n',df_score.loc[:,(i,'cum_score')],'\n')
+    # for i in [2]:
+    #     print(i,'\n',df_score.loc[:,(i,'cum_score')],'\n')
 
     df_score = df_score.stack(level=0).reset_index().rename(index=str,columns={'level_0':'player','level_1':'elimination'})
-
+    # df_score['player'] = df_score['player'].map(lambda x:x.split('(')[0])
+    # print(df_score['player'])
     # engine = create_engine('sqlite:///db.sqlite3',echo=False)
     # df_score.to_sql(name=Score,con=engine,if_exists='replace',index=False)
 
-    Score.objects.all().delete()
+    # Score.objects.filter(player__season__current_season__exact=True).delete()
 
     dict_score = df_score.to_dict('records')
-    # print(dict_score,'\n')
     for dict in dict_score:
-        p = Player.objects.get(name=dict['player'])
+        p = Player.objects.get(name=dict['player'].split(' (')[0])
         Score.objects.update_or_create(player=p,elimination=dict['elimination'],score=dict['score'],cum_score=dict['cum_score'],rank=dict['rank'],points_back=dict['points_back'],maximum_points_remaining=dict['maximum_points_remaining'])
     # Score.objects.bulk_create(Score(**vals) for vals in dict_score)
 
@@ -135,7 +135,7 @@ def score():
 
     if __name__ == '__main__':
         print('Score')
-        print(df_score)
+        # print(df_score)
 
 class Command(BaseCommand):
 

@@ -20,7 +20,8 @@
   <div class="cur_scores">
     {% if season and cur_scoring_round and num_scoring_rounds %}
       {% for entry in season %}
-          <h1>CURRENT STANDINGS (Elimination {{entry.current_elimination}}; Scoring Round {{cur_scoring_round}}/{{num_scoring_rounds}})</h1>
+          <h1>CURRENT STANDINGS</h1>
+          <p>As of Rose Ceremony {{entry.current_elimination}}. Scoring Round {{cur_scoring_round}}/{{num_scoring_rounds}}.</p>
       {% endfor %}
     {% endif %}
     {% if cur_scores %}
@@ -34,7 +35,7 @@
         </thead>
         {% for entry in cur_scores %}
           <tr>
-            <td>{{entry.player}}</td>
+            <td>{{entry.player.name}}</td>
             <td>{{entry.rank}}</td>
             <td>{{entry.cum_score}}</td>
             <td>{{entry.points_back}}</td>
