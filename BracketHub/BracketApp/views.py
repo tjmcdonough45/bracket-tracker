@@ -10,6 +10,9 @@ from django.urls import reverse_lazy,reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from itertools import chain
+import plotly.offline as opy
+import plotly.graph_objs as go
+from plotly import tools
 
 # Create your views here.
 
@@ -57,11 +60,100 @@ def current_season(request):
     most_individual_immunity_wins = contestants.order_by('-num_individual_immunity_wins').first()
     most_votes_against = contestants.order_by('-num_votes_against').first()
 
-    dict = {'season':season,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
+    traces=[]
+
+    x1=list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('elimination',flat=True))
+    points_per_contestant_remaining=list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('points_per_contestant_remaining',flat=True))
+    num_boots = list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('num_boots',flat=True))
+    num_contestants_remaining = -np.cumsum(num_boots)+23
+    ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
+    y1=np.cumsum(ideal)
+    y2=np.repeat(np.sum(ideal),len(x1))
+
+    trace1 = go.Scatter(x=x1, y=y1, mode='lines', name='ideal',
+        line = dict(
+            dash='dash',
+            color = 'steelblue',
+        )
+    )
+    trace2 = go.Scatter(x=x1, y=y2, mode='lines', name='ideal',yaxis='y2',
+        line = dict(
+            dash='dash',
+            color = 'orange',
+        )
+    )
+    traces.append(trace1)
+    traces.append(trace2)
+
+    for player in players:
+        x1=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('elimination',flat=True))
+        y1=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('cum_score',flat=True))
+        max_rem=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('maximum_points_remaining',flat=True))
+        y2= np.array(y1) + np.array(max_rem)
+        # y2 = max_rem
+        trace1 = go.Scatter(x=x1, y=y1, mode='lines+markers', name=player.name,
+            marker = dict(
+                size = 6,
+                color = 'steelblue',
+                line = dict(
+                    width = 1,
+                )
+            )
+        )
+        trace2 = go.Scatter(x=x1, y=y2, mode='lines+markers', name=player.name,yaxis='y2',
+            marker = dict(
+                size = 6,
+                color = 'orange',
+                line = dict(
+                    width = 1,
+                )
+            )
+        )
+        traces.append(trace1)
+        traces.append(trace2)
+
+    data=go.Data(traces)
+    layout=go.Layout(height=1000,width=1000,
+        # title="Cumulative score vs. rose ceremony",
+        xaxis={'title':'Rose Ceremony'},
+        yaxis=dict(
+            title='Cumulative Score',
+            range=[0,375],
+            linecolor='black',
+            titlefont=dict(
+                color='steelblue'
+            ),
+            tickfont=dict(
+                color='steelblue'
+            )
+        ),
+        yaxis2=dict(
+            title='Maximum Points Possible',
+            range=[0,375],
+            linecolor='black',
+            titlefont=dict(
+                color='orange'
+            ),
+            tickfont=dict(
+                color='orange'
+            ),
+            overlaying='y',
+            side='right'
+        ),
+        legend=dict(
+            x=1.1,
+            y=1
+        )
+        # showlegend=False
+    )
+    fig=go.Figure(data=data,layout=layout)
+    div = opy.plot(fig, auto_open=False, output_type='div')
+
+    context_dict = {'season':season,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
         'scores':scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
         'ranks':predicted_rank_init,'bonus_picks':bonus_picks,'most_confessionals':most_confessionals,'most_individual_immunity_wins':most_individual_immunity_wins,
-        'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics,'cur_scores_and_pics':cur_scores_and_pics}
-    return render(request,'BracketApp/current_season.html',context=dict)
+        'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics,'cur_scores_and_pics':cur_scores_and_pics,'graph':div}
+    return render(request,'BracketApp/current_season.html',context=context_dict)
 
 # def past_seasons(request):
 #     players = Player.objects.all()

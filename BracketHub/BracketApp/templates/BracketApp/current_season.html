@@ -16,37 +16,11 @@
     });
   </script> -->
 
-  <div class="cur">
-  <div class="cur_scores">
-    {% if season and cur_scoring_round and num_scoring_rounds %}
-      {% for entry in season %}
-          <h1>CURRENT STANDINGS</h1>
-          <p>As of Rose Ceremony {{entry.current_elimination}}. Scoring Round {{cur_scoring_round}}/{{num_scoring_rounds}}.</p>
-      {% endfor %}
-    {% endif %}
-    {% if cur_scores %}
-      <table class="table table-hover">
-        <thead>
-          <th>Player</th>
-          <th>Place</th>
-          <th>Cumulative Score</th>
-          <th>Points Behind Leader</th>
-          <th>Maximum Points Left to Be Earned</th>
-        </thead>
-        {% for entry in cur_scores %}
-          <tr>
-            <td>{{entry.player.name}}</td>
-            <td>{{entry.rank}}</td>
-            <td>{{entry.cum_score}}</td>
-            <td>{{entry.points_back}}</td>
-            <td>{{entry.maximum_points_remaining}}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>NO CURRENT SCORES!</p>
-    {% endif %}
-  </div>
+  {% if graph %}
+    <div style="width:600;height:500">
+      {{ graph|safe }}
+    </div>
+  {% endif %}
 
   <p></p>
 
@@ -152,6 +126,38 @@
   </div>
 
   <p></p>
+
+  <div class="cur">
+  <div class="cur_scores">
+    {% if season and cur_scoring_round and num_scoring_rounds %}
+      {% for entry in season %}
+          <h1>CURRENT STANDINGS</h1>
+          <p>As of Rose Ceremony {{entry.current_elimination}} (Scoring Round {{cur_scoring_round}}/{{num_scoring_rounds}})</p>
+      {% endfor %}
+    {% endif %}
+    {% if cur_scores %}
+      <table class="table table-hover">
+        <thead>
+          <th>Player</th>
+          <th>Place</th>
+          <th>Cumulative Score</th>
+          <th>Points Behind Leader</th>
+          <th>Maximum Points Left to Be Earned</th>
+        </thead>
+        {% for entry in cur_scores %}
+          <tr>
+            <td>{{entry.player.name}}</td>
+            <td>{{entry.rank}}</td>
+            <td>{{entry.cum_score}}</td>
+            <td>{{entry.points_back}}</td>
+            <td>{{entry.maximum_points_remaining}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>NO CURRENT SCORES!</p>
+    {% endif %}
+  </div>
 
   <!-- <div class="bonus">
     <h1>BONUS CATEGORIES</h1>
