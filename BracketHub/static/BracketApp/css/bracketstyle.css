@@ -19,7 +19,7 @@
     text-align: center;
 } */
 
-.table > tbody > tr > td {
+table, tbody, tr, td {
   text-align: center;
   vertical-align: middle;
 }
@@ -29,14 +29,14 @@ table{
   margin-right: auto;
 }
 
-div.cur {
+/* div.cur {
     text-align: left;
 }
 
 div.cur table {
     margin: 0 auto;
     text-align: center;
-}
+} */
 
 div.error{
   color: red;
