@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.models import inlineformset_factory
 from django.core import validators
-from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score
+from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score,Bonus
 
 class PlayerForm(forms.ModelForm):
     #Define fields here if want to do custom validators
@@ -21,7 +21,8 @@ class PlayerForm(forms.ModelForm):
 #         model = Bracket
 #         exclude = ('player',)
 
-contestants_pool = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
+season = Season.objects.filter(current_season__exact=True).order_by('-premiere')[0]
+contestants_pool = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
 num_contestants = len(contestants_pool.values_list())
 
 class BaseBracketFormSet(forms.BaseInlineFormSet):
@@ -29,7 +30,7 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         super(BaseBracketFormSet, self).__init__(*args, **kwargs)
         for form in self:
-            form.fields['contestant'].queryset = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
+            form.fields['contestant'].queryset = contestants_pool
 
     def clean(self):
         """Checks that no two brackets have the same contestant."""
@@ -48,7 +49,8 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
 BracketFormSet = inlineformset_factory(Player, #parent form
                                         Bracket, #inline form model
                                         formset=BaseBracketFormSet,
-                                        fields=['predicted_rank','contestant'], #inline form fields
+                                        # fields=['predicted_rank','contestant'], #inline form fields
+                                        fields=['contestant'],
                                         labels={ #labels for the fields
                                             'contestant':'Contestant',
                                             'predicted_rank':'Finish',
@@ -62,6 +64,16 @@ BracketFormSet = inlineformset_factory(Player, #parent form
                                         },
                                         can_delete=False, #set to false because can't delete a non-existent instance
                                         extra=num_contestants) #how many inline forms are in template by default
+
+class BonusForm(forms.ModelForm):
+    class Meta():
+        model = Bonus
+        fields = ('most_confessionals','most_individual_immunity_wins','most_votes_against',)
+
+    def __init__(self, *args, **kwargs):
+        super(BonusForm, self).__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].queryset = contestants_pool
 
 # Add custom validator (as below) by inserting validators=[function_name] into Field argument
 # def check_for_z(value):

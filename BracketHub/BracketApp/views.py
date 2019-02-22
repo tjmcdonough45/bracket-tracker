@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect
 from BracketApp.models import UserProfileInfo,Show,Season,Point,Player,Contestant,Bracket,Score,Bonus
-from BracketApp.bracket_form import PlayerForm,BracketFormSet
+from BracketApp.bracket_form import PlayerForm,BonusForm,BracketFormSet
 from BracketApp.registration_form import UserForm,UserProfileInfoForm
 import numpy as np
 from django.views.generic import View,TemplateView,ListView,DetailView,CreateView,UpdateView,DeleteView
@@ -13,6 +13,8 @@ from itertools import chain
 import plotly.offline as opy
 import plotly.graph_objs as go
 from plotly import tools
+from django.utils import timezone
+import datetime
 
 # Create your views here.
 
@@ -25,21 +27,21 @@ def help(request):
     return render(request,'BracketApp/help.html',context=help_dict)
 
 def current_season(request):
-    season = Season.objects.filter(current_season__exact=True)
-    cur_elimination = season.values()[0]['current_elimination']
-    first_scored_elimination = season.values()[0]['first_scored_elimination']
+    season = Season.objects.filter(current_season__exact=True,show__name__contains='The Bach')[0]
+    cur_elimination = season.current_elimination
+    first_scored_elimination = season.first_scored_elimination
     # cur_elimination = season.current_elimination
     cur_scoring_round = cur_elimination-first_scored_elimination+1
-    players = Player.objects.filter(season__current_season__exact=True)
-    contestants = Contestant.objects.filter(season__current_season__exact=True)
+    players = Player.objects.filter(season__exact=season)
+    contestants = Contestant.objects.filter(season__exact=season)
     num_contestants = len(contestants.values_list())
-    points = Point.objects.filter(season__current_season__exact=True).values_list('num_boots',flat=True)
+    points = Point.objects.filter(season__exact=season).values_list('num_boots',flat=True)
     num_scoring_rounds = len(points)
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
     predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
 
-    cur_scores = Score.objects.filter(elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
+    cur_scores = Score.objects.filter(player__season__exact=season,elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     scores = {}
     pics = {}
     brackets_and_pics = {}
@@ -62,9 +64,9 @@ def current_season(request):
 
     traces=[]
 
-    x1=list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('elimination',flat=True))
-    points_per_contestant_remaining=list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('points_per_contestant_remaining',flat=True))
-    num_boots = list(Point.objects.filter(season__current_season__exact=True).order_by('elimination').values_list('num_boots',flat=True))
+    x1=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('elimination',flat=True))
+    points_per_contestant_remaining=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('points_per_contestant_remaining',flat=True))
+    num_boots = list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('num_boots',flat=True))
     num_contestants_remaining = -np.cumsum(num_boots)+23
     ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
     y1=np.cumsum(ideal)
@@ -112,7 +114,6 @@ def current_season(request):
         traces.append(trace1)
         traces.append(trace2)
 
-    data=go.Data(traces)
     layout=go.Layout(height=1000,width=1000,
         # title="Cumulative score vs. rose ceremony",
         xaxis={'title':'Rose Ceremony'},
@@ -146,14 +147,143 @@ def current_season(request):
         )
         # showlegend=False
     )
-    fig=go.Figure(data=data,layout=layout)
+    fig=go.Figure(data=traces,layout=layout)
     div = opy.plot(fig, auto_open=False, output_type='div')
 
-    context_dict = {'season':season,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
+    context_dict = {'current_elimination':cur_elimination,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
         'scores':scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
         'ranks':predicted_rank_init,'bonus_picks':bonus_picks,'most_confessionals':most_confessionals,'most_individual_immunity_wins':most_individual_immunity_wins,
         'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics,'cur_scores_and_pics':cur_scores_and_pics,'graph':div}
     return render(request,'BracketApp/current_season.html',context=context_dict)
+
+def current_season_survivor(request):
+    season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')[0]
+    cur_elimination = season.current_elimination
+    first_scored_elimination = season.first_scored_elimination
+    # cur_elimination = season.current_elimination
+    cur_scoring_round = cur_elimination-first_scored_elimination+1
+    players = Player.objects.filter(season__exact=season)
+    contestants = Contestant.objects.filter(season__exact=season)
+    num_contestants = len(contestants.values_list())
+    num_eliminations = num_contestants-1
+    num_scoring_rounds = num_eliminations-first_scored_elimination+1
+    cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
+    predicted_rank_init = np.arange(num_contestants)+1
+
+    cur_scores = Score.objects.filter(player__season__exact=season,elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
+    scores = {}
+    pics = {}
+    brackets_and_pics = {}
+    cur_scores_and_pics = {}
+    for player in players:
+        bracket = Bracket.objects.filter(player__exact=player).order_by('predicted_rank')
+        # cur_score = cur_scores.filter(player__exact=player)
+        scores[player] = Score.objects.filter(player__exact=player).order_by('elimination')
+        pic = player.user.profile_pic
+        brackets_and_pics[player] = {'bracket':bracket,'pic':pic}
+        # cur_scores_and_pics[player] = {'cur_score':cur_score,'pic':pic}
+    # for i in np.arange(num_contestants)+1:
+    #     brackets[points[i]] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
+    bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
+    bonus_picks = Bonus.objects.all()
+
+    most_confessionals = contestants.order_by('-num_confessionals').first()
+    most_individual_immunity_wins = contestants.order_by('-num_individual_immunity_wins').first()
+    most_votes_against = contestants.order_by('-num_votes_against').first()
+
+    traces=[]
+
+    x1=np.arange(num_scoring_rounds)+1
+    points_per_contestant_remaining=np.arange(num_scoring_rounds)+1
+    num_boots = np.repeat([1],num_scoring_rounds)
+    num_contestants_remaining = -np.cumsum(num_boots)+num_contestants
+    ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
+    y1=np.cumsum(ideal)
+    y2=np.repeat(np.sum(ideal),len(x1))
+
+    trace1 = go.Scatter(x=x1, y=y1, mode='lines', name='ideal',
+        line = dict(
+            dash='dash',
+            color = 'steelblue',
+        )
+    )
+    trace2 = go.Scatter(x=x1, y=y2, mode='lines', name='ideal',yaxis='y2',
+        line = dict(
+            dash='dash',
+            color = 'orange',
+        )
+    )
+    traces.append(trace1)
+    traces.append(trace2)
+
+    for player in players:
+        x1=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('elimination',flat=True))
+        y1=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('cum_score',flat=True))
+        max_rem=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('maximum_points_remaining',flat=True))
+        y2= np.array(y1) + np.array(max_rem)
+        # y2 = max_rem
+        trace1 = go.Scatter(x=x1, y=y1, mode='lines+markers', name=player.name,
+            marker = dict(
+                size = 6,
+                color = 'steelblue',
+                line = dict(
+                    width = 1,
+                )
+            )
+        )
+        trace2 = go.Scatter(x=x1, y=y2, mode='lines+markers', name=player.name,yaxis='y2',
+            marker = dict(
+                size = 6,
+                color = 'orange',
+                line = dict(
+                    width = 1,
+                )
+            )
+        )
+        traces.append(trace1)
+        traces.append(trace2)
+
+    layout=go.Layout(height=1000,width=1000,
+        # title="Cumulative score vs. rose ceremony",
+        xaxis={'title':'Rose Ceremony'},
+        yaxis=dict(
+            title='Cumulative Score',
+            range=[0,1000],
+            linecolor='black',
+            titlefont=dict(
+                color='steelblue'
+            ),
+            tickfont=dict(
+                color='steelblue'
+            )
+        ),
+        yaxis2=dict(
+            title='Maximum Points Possible',
+            range=[0,1000],
+            linecolor='black',
+            titlefont=dict(
+                color='orange'
+            ),
+            tickfont=dict(
+                color='orange'
+            ),
+            overlaying='y',
+            side='right'
+        ),
+        legend=dict(
+            x=1.1,
+            y=1
+        )
+        # showlegend=False
+    )
+    fig=go.Figure(data=traces,layout=layout)
+    div = opy.plot(fig, auto_open=False, output_type='div')
+
+    context_dict = {'current_elimination':cur_elimination,'players':players,'cur_boots':cur_boots,'bonus':bonus,'cur_scores':cur_scores,
+        'scores':scores,'cur_scoring_round':cur_scoring_round,'num_scoring_rounds':num_scoring_rounds,
+        'ranks':predicted_rank_init,'bonus_picks':bonus_picks,'most_confessionals':most_confessionals,'most_individual_immunity_wins':most_individual_immunity_wins,
+        'most_votes_against':most_votes_against,'brackets_and_pics':brackets_and_pics,'cur_scores_and_pics':cur_scores_and_pics,'graph':div}
+    return render(request,'BracketApp/current_season_survivor.html',context=context_dict)
 
 # def past_seasons(request):
 #     players = Player.objects.all()
@@ -411,46 +541,96 @@ def user_login(request):
 def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
-    season = Season.objects.filter(current_season__exact=True)
-    first_scored_elimination = season.values()[0]['first_scored_elimination']
-    points = Point.objects.filter(season__current_season__exact=True)
-    num_scoring_rounds = len(points.values_list())
-    num_eliminations = num_scoring_rounds+first_scored_elimination-1
-    contestants = Contestant.objects.filter(season__current_season__exact=True,actual_elimination__exact=69)
+    season = Season.objects.filter(current_season__exact=True).order_by('-premiere')[0]
+    first_scored_elimination = season.first_scored_elimination
+    contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
     num_contestants = len(contestants.values_list())
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
+    show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
+    if season.premiere > timezone.now()-datetime.timedelta(days=7):
+        entry_open = True
+    else:
+        entry_open = False
 
-    if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season[0]).values_list())==0:
-        submitted = False
-        if request.method == "POST":
-            player_form = PlayerForm(data=request.POST)
-            bracket_form = BracketFormSet(data=request.POST)
-            if player_form.is_valid() and bracket_form.is_valid():
-                new_player = player_form.save(commit=False)
-                new_player.user = userprofileinfo
-                new_player.season = season[0]
-                new_player.save()
-                new_bracket = bracket_form.save(commit=False)
-                for br in new_bracket:
-                    br.player = new_player
-                    # br.predicted_rank = 1
-                    br.predicted_elimination = num_eliminations-br.predicted_rank+2
-                    # br.contestant = contestants[0]
-                    br.save()
+    if show == 'Survivor':
+        num_eliminations = num_contestants-1
+        predicted_rank_init = np.arange(num_contestants)+1
+        if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
+            submitted = False
+            if request.method == "POST":
+                player_form = PlayerForm(data=request.POST)
+                bonus_form = BonusForm(data=request.POST)
+                bracket_form = BracketFormSet(data=request.POST)
+                if player_form.is_valid() and bonus_form.is_valid() and bracket_form.is_valid():
+                    new_player = player_form.save(commit=False)
+                    new_player.user = userprofileinfo
+                    new_player.season = season
+                    new_player.save()
+
+                    new_bonus = bonus_form.save(commit=False)
+                    new_bonus.player = new_player
+                    new_bonus.save()
+
+                    new_bracket = bracket_form.save(commit=False)
+                    i=1
+                    for br in new_bracket:
+                        br.player = new_player
+                        br.predicted_rank = i
+                        br.predicted_elimination = num_eliminations-br.predicted_rank+2
+                        br.save()
+                        i=i+1
                     submitted=True
-                # new_bracket.save()
+                    # new_bracket.save()
+                else:
+                    # One of the forms was invalid if this else gets called.
+                    print(player_form.errors,bonus_form.errors,bracket_form.errors)
             else:
-                # One of the forms was invalid if this else gets called.
-                print(player_form.errors,bracket_form.errors)
+                player_form = PlayerForm()
+                bonus_form = BonusForm()
+                bracket_form = BracketFormSet(initial=[{'contestant':j,
+                                                        'predicted_rank': predicted_rank_init[i]
+                                                        } for i,j in zip(np.arange(num_contestants),contestants)])
         else:
+            submitted = True
+            player_form = PlayerForm()
+            bonus_form = BonusForm()
+            bracket_form = BracketFormSet(initial=[{'contestant':j,
+                                                    'predicted_rank': predicted_rank_init[i]
+                                                    } for i,j in zip(np.arange(num_contestants),contestants)])
+        return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
+    else:
+        points = Point.objects.filter(season__exact=season)
+        num_scoring_rounds = len(points.values_list())
+        num_eliminations = num_scoring_rounds+first_scored_elimination-1
+        predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
+        if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
+            submitted = False
+            if request.method == "POST":
+                player_form = PlayerForm(data=request.POST)
+                bracket_form = BracketFormSet(data=request.POST)
+                if player_form.is_valid() and bracket_form.is_valid():
+                    new_player = player_form.save(commit=False)
+                    new_player.user = userprofileinfo
+                    new_player.season = season
+                    new_player.save()
+                    new_bracket = bracket_form.save(commit=False)
+                    for br in new_bracket:
+                        br.player = new_player
+                        br.predicted_elimination = num_eliminations-br.predicted_rank+2
+                        br.save()
+                    submitted=True
+                    # new_bracket.save()
+                else:
+                    # One of the forms was invalid if this else gets called.
+                    print(player_form.errors,bracket_form.errors)
+            else:
+                player_form = PlayerForm()
+                bracket_form = BracketFormSet(initial=[{'contestant':j,
+                                                        'predicted_rank': predicted_rank_init[i]
+                                                        } for i,j in zip(np.arange(num_contestants),contestants)])
+        else:
+            submitted = True
             player_form = PlayerForm()
             bracket_form = BracketFormSet(initial=[{'contestant':j,
                                                     'predicted_rank': predicted_rank_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
-    else:
-        submitted = True
-        player_form = PlayerForm()
-        bracket_form = BracketFormSet(initial=[{'contestant':j,
-                                                'predicted_rank': predicted_rank_init[i]
-                                                } for i,j in zip(np.arange(num_contestants),contestants)])
-    return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted})
+        return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})

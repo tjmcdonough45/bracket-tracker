@@ -21,7 +21,10 @@
           <a class="nav-link" href="{% url 'index' %}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:current_season' %}">Current season</a>
+          <a class="nav-link" href="{% url 'BracketApp:current_season' %}">Current Bachelor(ette) season</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'BracketApp:current_season_survivor' %}">Current Survivor season</a>
         </li>
         {% if user.is_authenticated %}
           <li class="nav-item">

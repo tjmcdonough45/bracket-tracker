@@ -7,6 +7,7 @@ app_name = 'BracketApp'
 urlpatterns = [
     path('bracket_entry/',views.bracket_entry,name='bracket_entry'),
     path('current_season/', views.current_season, name='current_season'),
+    path('current_season_survivor/',views.current_season_survivor,name='current_season_survivor'),
     path('seasons/', views.SeasonListView.as_view(), name='seasons'),
     path('seasons/<int:pk>/',views.SeasonDetailView.as_view(),name='detail'),
     path('create/',views.PlayerCreateView.as_view(),name='create'),
