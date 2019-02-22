@@ -12,18 +12,18 @@ import pandas as pd
 # from sqlalchemy import create_engine
 # from django.db import transaction
 
-def score():
-    qs_season = Season.objects.filter(current_season__exact=True).values()[0]
+def score(subtitle):
+    qs_season = Season.objects.filter(subtitle__exact=subtitle).values()[0]
     cur_elimination = qs_season['current_elimination']
     first_scored_elimination = qs_season['first_scored_elimination']
     show = Show.objects.filter(id__exact=qs_season['show_id']).values()[0]['name']
     # print(show)
 
-    qs_bracket = Bracket.objects.filter(player__season__current_season__exact=True)
+    qs_bracket = Bracket.objects.filter(player__season__subtitle__exact=subtitle)
     df_bracket = read_frame(qs_bracket)
     # print(df_bracket.head(),'\n')
 
-    qs_contestant = Contestant.objects.filter(season__current_season__exact=True)
+    qs_contestant = Contestant.objects.filter(season__subtitle__exact=subtitle)
     # print(len(qs_contestant.values_list('last_name',flat=True)))
     df_contestant = read_frame(qs_contestant)
     df_contestant['contestant'] = df_contestant['first_name'] + ' ' + df_contestant['last_name']
@@ -31,13 +31,13 @@ def score():
     # print(df_contestant.head(),'\n')
     num_contestants = df_contestant['contestant'].size
 
-    qs_point = Point.objects.filter(season__current_season__exact=True).order_by('elimination')
+    qs_point = Point.objects.filter(season__subtitle__exact=subtitle).order_by('elimination')
     if qs_point:
         df_point = read_frame(qs_point)
     else:
         df_point = pd.DataFrame({'elimination':np.arange(first_scored_elimination,num_contestants),
-            'points_per_contestant_remaining':np.arange(first_scored_elimination,num_contestants)-1,
-            'num_boots':np.repeat([1],num_contestants-2)})
+            'points_per_contestant_remaining':np.arange(first_scored_elimination,num_contestants),
+            'num_boots':np.repeat([1],num_contestants-first_scored_elimination)})
     df_point.set_index('elimination',inplace=True)
 
     num_eliminations = df_point.index[-1]
