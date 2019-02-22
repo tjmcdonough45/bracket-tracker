@@ -38,7 +38,7 @@ class Show(models.Model):
 class Season(models.Model):
     show = models.ForeignKey(Show,default=1,on_delete=models.PROTECT)
     subtitle = models.CharField(max_length=69,default='David vs. Goliath')
-    premiere = models.DateTimeField(null = True)
+    premiere = models.DateField(default=django.utils.timezone.now)
     current_elimination = models.PositiveIntegerField(default=0)
     current_season = models.BooleanField(default=False)
     first_scored_elimination = models.PositiveIntegerField(default=1)
