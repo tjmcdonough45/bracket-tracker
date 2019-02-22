@@ -15,6 +15,7 @@ import plotly.graph_objs as go
 from plotly import tools
 from django.utils import timezone
 import datetime
+import pytz
 
 # Create your views here.
 
@@ -546,7 +547,7 @@ def bracket_entry(request):
     contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
     num_contestants = len(contestants.values_list())
     show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    if season.premiere > timezone.now()-datetime.timedelta(days=7):
+    if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
         entry_open = True
     else:
         entry_open = False
