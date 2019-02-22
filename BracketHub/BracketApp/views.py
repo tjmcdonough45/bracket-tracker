@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from django.shortcuts import render_to_response
+from django.shortcuts import render,render_to_response,get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from BracketApp.models import UserProfileInfo,Show,Season,Point,Player,Contestant,Bracket,Score,Bonus
 from BracketApp.bracket_form import PlayerForm,BonusForm,BracketFormSet
@@ -542,25 +541,27 @@ def user_login(request):
 def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
-    season = Season.objects.filter(current_season__exact=True).order_by('-premiere')[0]
-    first_scored_elimination = season.first_scored_elimination
-    contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
-    num_contestants = len(contestants.values_list())
-    show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
-        entry_open = True
-    else:
-        entry_open = False
+    # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
+    show='Survivor'
 
     if show == 'Survivor':
+        qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
+        season = get_object_or_404(qs_season)
+        first_scored_elimination = season.first_scored_elimination
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+        num_contestants = len(contestants.values_list())
+        if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
+            entry_open = True
+        else:
+            entry_open = False
         num_eliminations = num_contestants-1
         predicted_rank_init = np.arange(num_contestants)+1
         if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
             submitted = False
             if request.method == "POST":
                 player_form = PlayerForm(data=request.POST)
-                bonus_form = BonusForm(data=request.POST)
-                bracket_form = BracketFormSet(data=request.POST)
+                bonus_form = BonusForm(season,data=request.POST)
+                bracket_form = BracketFormSet(season,data=request.POST)
                 if player_form.is_valid() and bonus_form.is_valid() and bracket_form.is_valid():
                     new_player = player_form.save(commit=False)
                     new_player.user = userprofileinfo
@@ -586,19 +587,28 @@ def bracket_entry(request):
                     print(player_form.errors,bonus_form.errors,bracket_form.errors)
             else:
                 player_form = PlayerForm()
-                bonus_form = BonusForm()
-                bracket_form = BracketFormSet(initial=[{'contestant':j,
+                bonus_form = BonusForm(season)
+                bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                         'predicted_rank': predicted_rank_init[i]
                                                         } for i,j in zip(np.arange(num_contestants),contestants)])
         else:
             submitted = True
             player_form = PlayerForm()
-            bonus_form = BonusForm()
-            bracket_form = BracketFormSet(initial=[{'contestant':j,
+            bonus_form = BonusForm(season)
+            bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                     'predicted_rank': predicted_rank_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
         return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
     else:
+        qs_season = Season.objects.filter(current_season__exact=True,show__name__contains='The Bach')
+        season = get_object_or_404(qs_season)
+        first_scored_elimination = season.first_scored_elimination
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+        num_contestants = len(contestants.values_list())
+        if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
+            entry_open = True
+        else:
+            entry_open = False
         points = Point.objects.filter(season__exact=season)
         num_scoring_rounds = len(points.values_list())
         num_eliminations = num_scoring_rounds+first_scored_elimination-1
@@ -607,7 +617,7 @@ def bracket_entry(request):
             submitted = False
             if request.method == "POST":
                 player_form = PlayerForm(data=request.POST)
-                bracket_form = BracketFormSet(data=request.POST)
+                bracket_form = BracketFormSet(season,data=request.POST)
                 if player_form.is_valid() and bracket_form.is_valid():
                     new_player = player_form.save(commit=False)
                     new_player.user = userprofileinfo
@@ -625,13 +635,13 @@ def bracket_entry(request):
                     print(player_form.errors,bracket_form.errors)
             else:
                 player_form = PlayerForm()
-                bracket_form = BracketFormSet(initial=[{'contestant':j,
+                bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                         'predicted_rank': predicted_rank_init[i]
                                                         } for i,j in zip(np.arange(num_contestants),contestants)])
         else:
             submitted = True
             player_form = PlayerForm()
-            bracket_form = BracketFormSet(initial=[{'contestant':j,
+            bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                     'predicted_rank': predicted_rank_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
         return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})

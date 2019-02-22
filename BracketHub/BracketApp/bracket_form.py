@@ -3,6 +3,7 @@ from django.forms.models import inlineformset_factory
 from django.core import validators
 from BracketApp.models import Show,Season,Player,Contestant,Bracket,Score,Bonus
 
+
 class PlayerForm(forms.ModelForm):
     #Define fields here if want to do custom validators
     class Meta():
@@ -21,18 +22,14 @@ class PlayerForm(forms.ModelForm):
 #         model = Bracket
 #         exclude = ('player',)
 
-season = Season.objects.filter(current_season__exact=True).order_by('-premiere')[0]
-contestants_pool = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
-num_contestants = len(contestants_pool.values_list())
-
 class BaseBracketFormSet(forms.BaseInlineFormSet):
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, season, *args, **kwargs):
         super(BaseBracketFormSet, self).__init__(*args, **kwargs)
         for form in self:
-            form.fields['contestant'].queryset = contestants_pool
+            form.fields['contestant'].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
 
-    def clean(self):
+    def clean(self,season):
+        contestants_pool = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
         """Checks that no two brackets have the same contestant."""
         if any(self.errors):
             # Don't bother validating the formset unless each form is valid on its own
@@ -63,17 +60,17 @@ BracketFormSet = inlineformset_factory(Player, #parent form
                                             'predicted_rank': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_rank field read-only; populate with necessary options in view
                                         },
                                         can_delete=False, #set to false because can't delete a non-existent instance
-                                        extra=num_contestants) #how many inline forms are in template by default
+                                        extra=18) #how many inline forms are in template by default
 
 class BonusForm(forms.ModelForm):
     class Meta():
         model = Bonus
         fields = ('most_confessionals','most_individual_immunity_wins','most_votes_against',)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, season, *args, **kwargs):
         super(BonusForm, self).__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].queryset = contestants_pool
+            self.fields[field].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
 
 # Add custom validator (as below) by inserting validators=[function_name] into Field argument
 # def check_for_z(value):
