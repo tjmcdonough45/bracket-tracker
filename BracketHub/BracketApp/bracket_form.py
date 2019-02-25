@@ -28,8 +28,7 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
         for form in self:
             form.fields['contestant'].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
 
-    def clean(self,season):
-        contestants_pool = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+    def clean(self):
         """Checks that no two brackets have the same contestant."""
         if any(self.errors):
             # Don't bother validating the formset unless each form is valid on its own
@@ -37,8 +36,6 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
         contestants = []
         for form in self.forms:
             contestant = form.cleaned_data['contestant']
-            if contestant not in contestants_pool:
-                raise forms.ValidationError("Select only contestants from the current season who have not yet been eliminated.")
             if contestant in contestants:
                 raise forms.ValidationError("Select each contestant only once.")
             contestants.append(contestant)
