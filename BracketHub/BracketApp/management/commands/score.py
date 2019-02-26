@@ -80,7 +80,7 @@ def score(subtitle):
 
     #score 40 bonus points per correct answer to bonus questions
     if show=='Survivor' and cur_elimination==num_eliminations:
-        qs_bonus = Bonus.objects.filter(season__current_season__exact=True)
+        qs_bonus = Bonus.objects.filter(season__subtitle__exact=subtitle)
         df_bonus = read_frame(qs_bonus)
         # print(df_bonus.head())
         df_contestant.set_index('contestant',inplace=True)
@@ -121,7 +121,7 @@ def score(subtitle):
 
     dict_score = df_score.to_dict('records')
     for dict in dict_score:
-        p = Player.objects.get(name=dict['player'].split(' (')[0])
+        p = Player.objects.filter(season__subtitle__exact=subtitle).get(name=dict['player'].split(' (')[0])
         Score.objects.update_or_create(player=p,elimination=dict['elimination'],score=dict['score'],cum_score=dict['cum_score'],rank=dict['rank'],points_back=dict['points_back'],maximum_points_remaining=dict['maximum_points_remaining'])
     # Score.objects.bulk_create(Score(**vals) for vals in dict_score)
 
