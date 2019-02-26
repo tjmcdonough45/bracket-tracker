@@ -65,7 +65,7 @@
 
   <p></p>
 
-  {% if bonus_picks and most_confessionals and most_individual_immunity_wins and most_votes_against %}
+  <!-- {% if bonus_picks and most_confessionals and most_individual_immunity_wins and most_votes_against %}
   <div class="bonus_picks">
     <h1>BONUS PICKS</h1>
     <table class="table table-hover">
@@ -101,7 +101,7 @@
     </table>
   </div>
   <p></p>
-  {% endif %}
+  {% endif %} -->
 
   <div class="results">
     <h1>ELIMINATED CONTESTANTS</h1>
@@ -129,8 +129,8 @@
 
   <div class="cur">
   <div class="cur_scores">
+    <h1>CURRENT STANDINGS</h1>
     {% if current_elimination and cur_scoring_round and num_scoring_rounds %}
-      <h1>CURRENT STANDINGS</h1>
       <p>As of Rose Ceremony {{current_elimination}} (Scoring Round {{cur_scoring_round}}/{{num_scoring_rounds}})</p>
     {% endif %}
     {% if cur_scores %}
@@ -156,53 +156,6 @@
       <p>NO CURRENT SCORES!</p>
     {% endif %}
   </div>
-
-  <!-- <div class="bonus">
-    <h1>BONUS CATEGORIES</h1>
-    {% if bonus %}
-      <table class="table table-hover">
-        <thead>
-          <th>Contestant</th>
-          <th>Confessionals</th>
-          <th>Individual Immunity Wins</th>
-          <th>Votes Against</th>
-        </thead>
-        {% for entry in bonus %}
-          <tr>
-            <td>{{entry.first_name}} {{entry.last_name}}</td>
-            <td>{{entry.num_confessionals}}</td>
-            <td>{{entry.num_individual_immunity_wins}}</td>
-            <td>{{entry.num_votes_against}}</td>
-          </tr>
-        {% endfor %}
-      </table>
-    {% else %}
-      <p>NO BONUS!</p>
-    {% endif %}
-  </div> -->
-
-  <!--<div class="brackets">-->
-  <!--  <h1>BRACKETS</h1>-->
-  <!--  {% if brackets %}-->
-  <!--    {% for key,value in brackets.items %}-->
-  <!--      <h2>{{ key }}</h2>-->
-  <!--      <table class="table table-hover">-->
-  <!--        <thead>-->
-  <!--          <th>Finish</th>-->
-  <!--          <th>Contestant</th>-->
-  <!--        </thead>-->
-  <!--        {% for bracket in value %}-->
-  <!--          <tr>-->
-  <!--            <td>{{bracket.predicted_rank}}</td>-->
-  <!--            <td>{{bracket.contestant}}</td>-->
-  <!--          </tr>-->
-  <!--        {% endfor %}-->
-  <!--      </table>-->
-  <!--    {% endfor %}-->
-  <!--  {% else %}-->
-  <!--    <p>NO BRACKETS!</p>-->
-  <!--  {% endif %}-->
-  <!--</div>-->
 
   <p></p>
 
