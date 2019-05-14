@@ -39,7 +39,8 @@ def current_season(request):
     num_scoring_rounds = len(points)
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
+    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
+    # predicted_elimination_init = [2,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,8,9,10,11]
 
     cur_scores = Score.objects.filter(player__season__exact=season,elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     scores = {}
@@ -67,7 +68,7 @@ def current_season(request):
     x1=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('elimination',flat=True))
     points_per_contestant_remaining=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('points_per_contestant_remaining',flat=True))
     num_boots = list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('num_boots',flat=True))
-    num_contestants_remaining = -np.cumsum(num_boots)+23
+    num_contestants_remaining = -np.cumsum(num_boots)+22
     ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
     y1=np.cumsum(ideal)
     y2=np.repeat(np.sum(ideal),len(x1))
@@ -542,7 +543,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='Survivor'
+    show='The Bachelorette'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
@@ -598,7 +599,7 @@ def bracket_entry(request):
             bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                     'predicted_rank': predicted_rank_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
-        return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
+        return render(request,'BracketApp/bracket_form_survivor.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
     else:
         qs_season = Season.objects.filter(current_season__exact=True,show__name__contains='The Bach')
         season = get_object_or_404(qs_season)
@@ -612,7 +613,8 @@ def bracket_entry(request):
         points = Point.objects.filter(season__exact=season)
         num_scoring_rounds = len(points.values_list())
         num_eliminations = num_scoring_rounds+first_scored_elimination-1
-        predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10,10]
+        predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
+        predicted_elimination_init = [2,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,8,9,10,11]
         if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
             submitted = False
             if request.method == "POST":
@@ -626,7 +628,8 @@ def bracket_entry(request):
                     new_bracket = bracket_form.save(commit=False)
                     for br in new_bracket:
                         br.player = new_player
-                        br.predicted_elimination = num_eliminations-br.predicted_rank+2
+                        # br.predicted_elimination = num_eliminations-br.predicted_rank+2
+                        br.predicted_rank = num_eliminations-br.predicted_elimination+2
                         br.save()
                     submitted=True
                     # new_bracket.save()
@@ -636,12 +639,12 @@ def bracket_entry(request):
             else:
                 player_form = PlayerForm()
                 bracket_form = BracketFormSet(season,initial=[{'contestant':j,
-                                                        'predicted_rank': predicted_rank_init[i]
+                                                        'predicted_elimination': predicted_elimination_init[i]
                                                         } for i,j in zip(np.arange(num_contestants),contestants)])
         else:
             submitted = True
             player_form = PlayerForm()
             bracket_form = BracketFormSet(season,initial=[{'contestant':j,
-                                                    'predicted_rank': predicted_rank_init[i]
+                                                    'predicted_elimination': predicted_elimination_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
-        return render(request,'BracketApp/bracket_form.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
+        return render(request,'BracketApp/bracket_form_bachelor.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
