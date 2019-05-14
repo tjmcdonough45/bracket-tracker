@@ -1,0 +1,59 @@
+{% extends "BracketApp/BracketApp_base.html" %}
+  {% load i18n %}
+  {% load bootstrap4 %}
+
+  {% block body_block %}
+  <div class="jumbotron">
+    {% if submitted %}
+      <h1 class=display>Thank you for submitting a bracket!</h1>
+      <h1 class=display>Good luck out there, tiger ;)</h1>
+    {% else %}
+      {% if entry_open %}
+        <h1 class=display>{{season}}</h1>
+        <form method="POST">
+          {% csrf_token %}
+          <fieldset>
+            <legend>Player</legend>
+            {{ player_form.non_field_errors }}
+      			{% for field in player_form %}
+      				<div class="row">
+      					<div class="col-md-3">{% bootstrap_label field.label %}</div>
+      					<div class="col-md-8">{% bootstrap_field field show_label=False %}</div>
+      				</div>
+      			{% endfor %}
+          </fieldset>
+
+          <fieldset>
+            <legend>Bracket</legend>
+            <ul>
+              <li>Match each contestant to the rose ceremony at which you predict they will be eliminated.</li>
+              <li>The rose ceremony values are prefilled to reflect the expected number of eliminated contestants for each rose ceremony.</li>
+              <li>Rose Ceremony 11 = THE ONE</li>
+              <!-- <li>A "finish" of 1 corresponds to THE ONE and 10 corresponds to contestants eliminated at the second rose ceremony.</li> -->
+            </ul>
+      			{{ bracket_form.management_form }}
+            <div class="error">
+              {{ bracket_form.non_form_errors }}
+            </div>
+            <ol class="row">
+              {% for form in bracket_form %}
+                <li>
+                  {% for field in form.visible_fields %}
+                    <div class="col-md-10">{% bootstrap_label field.label %}</div>
+                    <div class="col-md-10">{% bootstrap_field field show_label=False %}</div>
+                  {% endfor %}
+                </li>
+              {% endfor %}
+            </ol>
+          </fieldset>
+
+          <input type="submit" class="btn btn-primary" value="Submit">
+
+        </form>
+      {% else %}
+        <h1 class=display>Bracket entry is closed for {{season}}.</h1>
+        <h1 class=display>Come back next season!</h1>
+      {% endif %}
+    {% endif %}
+  </div>
+  {% endblock %}
