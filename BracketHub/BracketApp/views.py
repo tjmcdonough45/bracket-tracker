@@ -549,9 +549,9 @@ def bracket_entry(request):
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
         season = get_object_or_404(qs_season)
         first_scored_elimination = season.first_scored_elimination
-        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=700):
             entry_open = True
         else:
             entry_open = False
@@ -604,9 +604,9 @@ def bracket_entry(request):
         qs_season = Season.objects.filter(current_season__exact=True,show__name__contains='The Bach')
         season = get_object_or_404(qs_season)
         first_scored_elimination = season.first_scored_elimination
-        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(1,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=7):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=21):
             entry_open = True
         else:
             entry_open = False

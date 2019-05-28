@@ -80,7 +80,7 @@ def score(subtitle):
 
     #score 40 bonus points per correct answer to bonus questions
     if show=='Survivor' and cur_elimination==num_eliminations:
-        qs_bonus = Bonus.objects.filter(season__subtitle__exact=subtitle)
+        qs_bonus = Bonus.objects.filter(player__season__subtitle__exact=subtitle)
         df_bonus = read_frame(qs_bonus)
         # print(df_bonus.head())
         df_contestant.set_index('contestant',inplace=True)

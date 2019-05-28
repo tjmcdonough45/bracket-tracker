@@ -26,7 +26,7 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
     def __init__(self, season, *args, **kwargs):
         super(BaseBracketFormSet, self).__init__(*args, **kwargs)
         for form in self:
-            form.fields['contestant'].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+            form.fields['contestant'].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__gte=season.first_scored_elimination).order_by('first_name')
 
     def clean(self):
         """Checks that no two brackets have the same contestant."""
@@ -67,7 +67,7 @@ class BonusForm(forms.ModelForm):
     def __init__(self, season, *args, **kwargs):
         super(BonusForm, self).__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__exact=69).order_by('first_name')
+            self.fields[field].queryset = Contestant.objects.filter(season__exact=season,actual_elimination__gte=season.first_scored_elimination).order_by('first_name')
 
 # Add custom validator (as below) by inserting validators=[function_name] into Field argument
 # def check_for_z(value):
