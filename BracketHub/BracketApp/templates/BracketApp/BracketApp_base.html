@@ -42,11 +42,14 @@
             </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:logout' %}">Log out</a>
+            <a class="nav-link" href="{% url 'logout' %}">Log out</a>
           </li>
         {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:user_login' %}">Log in</a>
+            <a class="nav-link" href="{% url 'login' %}">Log in</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'password_reset' %}">Forgot password?</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'BracketApp:register' %}">Register</a>

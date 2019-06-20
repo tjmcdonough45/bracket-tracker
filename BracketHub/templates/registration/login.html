@@ -5,7 +5,7 @@
       <h1>Please log in</h1>
       <p></p>
 
-        <form method="POST" action="{% url 'BracketApp:user_login' %}">
+        <form method="POST" action="{% url 'login' %}">
           {% csrf_token %}
           {# A more "HTML" way of creating the login form#}
           <label for="username">Username:</label>
