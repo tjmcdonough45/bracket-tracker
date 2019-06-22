@@ -145,6 +145,8 @@ MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_REDIRECT_URL = 'index'
 
+DEFAULT_FROM_EMAIL = 'bracketracker@tjmcdonough45.pythonanywhere.com'
+
 #Send email to console
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
