@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from BracketApp import views
 
 #TEMPLATE TAGGING
@@ -14,8 +14,8 @@ urlpatterns = [
     path('update_profile/<int:pk>/',views.UserProfileInfoUpdateView.as_view(),name='update_profile'),
     path('delete/<int:pk>/',views.PlayerDeleteView.as_view(),name='delete'),
     path('register/',views.register,name='register'),
-    path('user_login/',views.user_login,name='user_login'),
-    path('logout/',views.user_logout,name='logout'),
+    # path('user_login/',views.user_login,name='user_login'),
+    # path('logout/',views.user_logout,name='logout'),
     path('special/',views.special,name='special'),
     path('help/', views.help, name='help'),
 ]
