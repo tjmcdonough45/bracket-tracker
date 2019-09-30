@@ -169,7 +169,7 @@ def current_season_survivor(request):
     num_eliminations = num_contestants-1
     num_scoring_rounds = num_eliminations-first_scored_elimination+1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
-    predicted_rank_init = np.arange(num_contestants)+1
+    predicted_rank_init = np.arange(num_scoring_rounds+1)+1
 
     cur_scores = Score.objects.filter(player__season__exact=season,elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     scores = {}
@@ -186,7 +186,7 @@ def current_season_survivor(request):
     # for i in np.arange(num_contestants)+1:
     #     brackets[points[i]] = Bracket.objects.filter(predicted_rank__exact=i).order_by('player__name')
     bonus = contestants.order_by('-num_confessionals','-num_individual_immunity_wins','-num_votes_against')
-    bonus_picks = Bonus.objects.all()
+    bonus_picks = Bonus.objects.filter(player__season__exact=season)
 
     most_confessionals = contestants.order_by('-num_confessionals').first()
     most_individual_immunity_wins = contestants.order_by('-num_individual_immunity_wins').first()
@@ -246,10 +246,10 @@ def current_season_survivor(request):
 
     layout=go.Layout(height=1000,width=1000,
         # title="Cumulative score vs. rose ceremony",
-        xaxis={'title':'Rose Ceremony'},
+        xaxis={'title':'Scoring Round'},
         yaxis=dict(
             title='Cumulative Score',
-            range=[0,1000],
+            range=[0,1300],
             linecolor='black',
             titlefont=dict(
                 color='steelblue'
@@ -260,7 +260,7 @@ def current_season_survivor(request):
         ),
         yaxis2=dict(
             title='Maximum Points Possible',
-            range=[0,1000],
+            range=[0,1300],
             linecolor='black',
             titlefont=dict(
                 color='orange'
@@ -543,7 +543,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='The Bachelorette'
+    show='Survivor'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
@@ -551,7 +551,7 @@ def bracket_entry(request):
         first_scored_elimination = season.first_scored_elimination
         contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=700):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=14):
             entry_open = True
         else:
             entry_open = False
