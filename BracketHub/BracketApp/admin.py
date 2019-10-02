@@ -38,7 +38,7 @@ class PlayerAdmin(admin.ModelAdmin):
     # list_editable = ['name']
 
 class ContestantAdmin(admin.ModelAdmin):
-    fields = ['season','first_name','last_name','actual_rank','actual_elimination','num_confessionals','num_individual_immunity_wins','num_votes_against','shameful_exit']
+    fields = ['season','first_name','last_name','actual_rank','actual_elimination','num_confessionals','num_individual_immunity_wins','num_votes_against','shameful_exit','contestant_pic']
     search_fields = ['season__name','first_name','last_name']
     list_filter = ['season']
     list_display = ['season','first_name','last_name','actual_rank','actual_elimination','num_confessionals','num_individual_immunity_wins','num_votes_against','shameful_exit']

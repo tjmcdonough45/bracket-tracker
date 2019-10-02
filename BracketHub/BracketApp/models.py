@@ -90,6 +90,7 @@ class Contestant(models.Model):
     num_confessionals = models.PositiveIntegerField(default=0)
     num_individual_immunity_wins = models.PositiveIntegerField(default=0)
     num_votes_against = models.PositiveIntegerField(default=0)
+    contestant_pic = models.URLField(default="https://wwwimage-secure.cbsstatic.com/thumbnails/photos/w400/cast/svr_cast_800x1000_0018_mollybyman.jpg")
 
     def __str__(self):
         # return "%s %s (%s)" % (self.first_name, self.last_name, self.season)
