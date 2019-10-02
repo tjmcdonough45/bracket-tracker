@@ -549,7 +549,7 @@ def bracket_entry(request):
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
         season = get_object_or_404(qs_season)
         first_scored_elimination = season.first_scored_elimination
-        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name')
         num_contestants = len(contestants.values_list())
         if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=14):
             entry_open = True
@@ -599,7 +599,7 @@ def bracket_entry(request):
             bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                     'predicted_rank': predicted_rank_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
-        return render(request,'BracketApp/bracket_form_survivor.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
+        return render(request,'BracketApp/bracket_form_survivor.html',{'player_form':player_form,'bonus_form':bonus_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season,'contestants':contestants})
     else:
         qs_season = Season.objects.filter(current_season__exact=True,show__name__contains='The Bach')
         season = get_object_or_404(qs_season)

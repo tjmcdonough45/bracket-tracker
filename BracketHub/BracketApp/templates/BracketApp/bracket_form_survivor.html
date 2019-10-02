@@ -76,4 +76,17 @@
       {% endif %}
     {% endif %}
   </div>
+
+  <div class="row">
+    {% for contestant in contestants %}
+      <div class="col-sm-4">
+        <div class="card text-white">
+          <img class="card-img" src="{{contestant.contestant_pic}}" alt=":D">
+          <div class="card-img-overlay">
+            <h4 class="card-title">{{contestant}}</h4>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
   {% endblock %}
