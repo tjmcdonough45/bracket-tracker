@@ -38,7 +38,7 @@ def score(subtitle):
             df_point = read_frame(qs_point)
         else:
             df_point = pd.DataFrame({'elimination':np.arange(first_scored_elimination,num_contestants),
-                'points_per_contestant_remaining':np.arange(first_scored_elimination,num_contestants),
+                'points_per_contestant_remaining':np.arange(1,num_contestants-first_scored_elimination+1),
                 'num_boots':np.repeat([1],num_contestants-first_scored_elimination)})
         df_point.set_index('elimination',inplace=True)
 
@@ -63,8 +63,10 @@ def score(subtitle):
             #score X points per player correctly guessed to survive Nth scoring elimination according to values in Point entries
             df2.set_index('contestant',inplace=True)
             df2['num_eliminations_survived'] = df2[['predicted_elimination','actual_elimination']].min(axis=1)-1
+            # print('label','\n',label,'\n','num_eliminations_survived','\n',df2['num_eliminations_survived'])
             for i in np.arange(first_scored_elimination,cur_elimination+1):
                 test = (df2['num_eliminations_survived']>=i)*df_point.loc[i,'points_per_contestant_remaining']
+                # print('label','\n',label,'\n','test','\n',test)
                 if i == shame:
                     df_score.loc[label,(i,'score')] = test.sum()-30 #30 point deduction for a winner pick having a shameful exit in the given elimination
                 else:
@@ -124,7 +126,7 @@ def score(subtitle):
         dict_score = df_score.to_dict('records')
         for dict in dict_score:
             p = Player.objects.filter(season__subtitle__exact=subtitle).get(name=dict['player'].split(' (')[0])
-            Score.objects.update_or_create(player=p,elimination=dict['elimination'],score=dict['score'],cum_score=dict['cum_score'],rank=dict['rank'],points_back=dict['points_back'],maximum_points_remaining=dict['maximum_points_remaining'])
+            Score.objects.update_or_create(player=p,elimination=dict['elimination'],defaults={'score':dict['score'],'cum_score':dict['cum_score'],'rank':dict['rank'],'points_back':dict['points_back'],'maximum_points_remaining':dict['maximum_points_remaining']})
         # Score.objects.bulk_create(Score(**vals) for vals in dict_score)
 
         # @transaction.commit_manually
@@ -146,5 +148,5 @@ class Command(BaseCommand):
 
     #A command must define handle()
     def handle(self,**options):
-        score()
+        score('Island of the Idols')
         self.stdout.write('Scoring brackets.')
