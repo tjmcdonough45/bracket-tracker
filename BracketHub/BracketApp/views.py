@@ -161,7 +161,6 @@ def current_season_survivor(request):
     season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')[0]
     cur_elimination = season.current_elimination
     first_scored_elimination = season.first_scored_elimination
-    # cur_elimination = season.current_elimination
     cur_scoring_round = cur_elimination-first_scored_elimination+1
     players = Player.objects.filter(season__exact=season)
     contestants = Contestant.objects.filter(season__exact=season)
@@ -194,10 +193,10 @@ def current_season_survivor(request):
 
     traces=[]
 
-    x1=np.arange(num_scoring_rounds)+1
-    points_per_contestant_remaining=np.arange(num_scoring_rounds)+1
+    x1=np.arange(first_scored_elimination,num_contestants)
+    points_per_contestant_remaining=np.arange(1,num_contestants-first_scored_elimination+1)
     num_boots = np.repeat([1],num_scoring_rounds)
-    num_contestants_remaining = -np.cumsum(num_boots)+num_contestants
+    num_contestants_remaining = num_contestants-np.cumsum(num_boots)-first_scored_elimination+1
     ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
     y1=np.cumsum(ideal)
     y2=np.repeat(np.sum(ideal),len(x1))
@@ -246,10 +245,10 @@ def current_season_survivor(request):
 
     layout=go.Layout(height=1000,width=1000,
         # title="Cumulative score vs. rose ceremony",
-        xaxis={'title':'Scoring Round'},
+        xaxis={'title':'Elimination'},
         yaxis=dict(
             title='Cumulative Score',
-            range=[0,1300],
+            range=[0,1000],
             linecolor='black',
             titlefont=dict(
                 color='steelblue'
@@ -260,7 +259,7 @@ def current_season_survivor(request):
         ),
         yaxis2=dict(
             title='Maximum Points Possible',
-            range=[0,1300],
+            range=[0,1000],
             linecolor='black',
             titlefont=dict(
                 color='orange'
@@ -549,13 +548,13 @@ def bracket_entry(request):
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
         season = get_object_or_404(qs_season)
         first_scored_elimination = season.first_scored_elimination
-        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name')
+        contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name') #contestants booted on or after first scored elimination
         num_contestants = len(contestants.values_list())
         if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=14):
             entry_open = True
         else:
             entry_open = False
-        num_eliminations = num_contestants-1
+        num_eliminations = num_contestants+first_scored_elimination-2
         predicted_rank_init = np.arange(num_contestants)+1
         if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
             submitted = False
