@@ -542,7 +542,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='Survivor'
+    show='Bachelor'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
@@ -605,7 +605,7 @@ def bracket_entry(request):
         first_scored_elimination = season.first_scored_elimination
         contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=21):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=8):
             entry_open = True
         else:
             entry_open = False
@@ -646,4 +646,4 @@ def bracket_entry(request):
             bracket_form = BracketFormSet(season,initial=[{'contestant':j,
                                                     'predicted_elimination': predicted_elimination_init[i]
                                                     } for i,j in zip(np.arange(num_contestants),contestants)])
-        return render(request,'BracketApp/bracket_form_bachelor.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season})
+        return render(request,'BracketApp/bracket_form_bachelor.html',{'player_form':player_form,'bracket_form':bracket_form,'submitted':submitted,'entry_open':entry_open,'season':season,'contestants':contestants})
