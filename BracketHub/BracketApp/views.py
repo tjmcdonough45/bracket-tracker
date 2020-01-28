@@ -94,7 +94,12 @@ def current_season(request):
         max_rem=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('maximum_points_remaining',flat=True))
         y2= np.array(y1) + np.array(max_rem)
         # y2 = max_rem
-        trace1 = go.Scatter(x=x1, y=y1, mode='lines+markers', name=player.name,
+        label_char_limit = 25
+        if len(player.name) < label_char_limit:
+            name = player.name
+        else:
+            name = player.name[:label_char_limit] + '...'
+        trace1 = go.Scatter(x=x1, y=y1, mode='lines+markers', name=name,
             marker = dict(
                 size = 6,
                 color = 'steelblue',
@@ -103,7 +108,7 @@ def current_season(request):
                 )
             )
         )
-        trace2 = go.Scatter(x=x1, y=y2, mode='lines+markers', name=player.name,yaxis='y2',
+        trace2 = go.Scatter(x=x1, y=y2, mode='lines+markers', name=name,yaxis='y2',
             marker = dict(
                 size = 6,
                 color = 'orange',
