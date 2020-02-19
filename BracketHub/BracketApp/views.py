@@ -227,6 +227,11 @@ def current_season_survivor(request):
         max_rem=list(Score.objects.filter(player__exact=player).order_by('elimination').values_list('maximum_points_remaining',flat=True))
         y2= np.array(y1) + np.array(max_rem)
         # y2 = max_rem
+        label_char_limit = 25
+        if len(player.name) < label_char_limit:
+            name = player.name
+        else:
+            name = player.name[:label_char_limit] + '...'
         trace1 = go.Scatter(x=x1, y=y1, mode='lines+markers', name=player.name,
             marker = dict(
                 size = 6,
@@ -253,7 +258,7 @@ def current_season_survivor(request):
         xaxis={'title':'Elimination'},
         yaxis=dict(
             title='Cumulative Score',
-            range=[0,1000],
+            range=[0,1350],
             linecolor='black',
             titlefont=dict(
                 color='steelblue'
@@ -264,7 +269,7 @@ def current_season_survivor(request):
         ),
         yaxis2=dict(
             title='Maximum Points Possible',
-            range=[0,1000],
+            range=[0,1350],
             linecolor='black',
             titlefont=dict(
                 color='orange'
@@ -547,7 +552,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='Bachelor'
+    show='Survivor'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
@@ -555,7 +560,7 @@ def bracket_entry(request):
         first_scored_elimination = season.first_scored_elimination
         contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name') #contestants booted on or after first scored elimination
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=14):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=21):
             entry_open = True
         else:
             entry_open = False
