@@ -8,72 +8,78 @@
     <link rel="stylesheet" href="{% static "BracketApp/css/bracketstyle.css" %}">
   </head>
   <body>
-    <nav class="navbar navbar-expand-sm bg-light">
-      {% if user.is_authenticated %}
-        {% if user.userprofileinfo.profile_pic %}
-          <a class="navbar-brand"><img src="{{user.userprofileinfo.profile_pic.url}}" alt="No pic :(" style="max-height: 100px"></a>
-        {% else %}
-          <a class="navbar-brand">[Profile pic here]</a>
-        {% endif %}
-      {% endif %}
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'index' %}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:current_season' %}">Current Bachelor(ette) season</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:current_season_survivor' %}">Current Survivor season</a>
-        </li>
+    <div id="page-container">
+      <nav class="navbar navbar-expand-sm bg-light">
         {% if user.is_authenticated %}
+          {% if user.userprofileinfo.profile_pic %}
+            <a class="navbar-brand"><img src="{{user.userprofileinfo.profile_pic.url}}" alt="No pic :(" style="max-height: 100px"></a>
+          {% else %}
+            <a class="navbar-brand">[Profile pic here]</a>
+          {% endif %}
+        {% endif %}
+        <ul class="navbar-nav">
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
+            <a class="nav-link" href="{% url 'index' %}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:seasons' %}">Seasons</a>
+            <a class="nav-link" href="{% url 'BracketApp:current_season' %}">Current Bachelor(ette) season</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:update_profile' user.pk %}">Update profile</a>
+            <a class="nav-link" href="{% url 'BracketApp:current_season_survivor' %}">Current Survivor season</a>
           </li>
-          {% if user.is_staff %}
+          {% if user.is_authenticated %}
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+              <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'BracketApp:seasons' %}">Seasons</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'BracketApp:update_profile' user.pk %}">Update profile</a>
+            </li>
+            {% if user.is_staff %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+              </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Log out</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Log in</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'password_reset' %}">Forgot password?</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'BracketApp:register' %}">Register</a>
             </li>
           {% endif %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Log out</a>
-          </li>
-        {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'login' %}">Log in</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'password_reset' %}">Forgot password?</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'BracketApp:register' %}">Register</a>
-          </li>
-        {% endif %}
-        <!-- <li class="nav-item">
-          <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
-        </li> -->
-        <!-- <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Past seasons</a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item" href="#">Item 1</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Item 2</a>
-          </div>
-        </li> -->
-        <!--<li class="nav-item"><a class="nav-link" href="{% url 'BracketApp:help' %}">Help</a></li>-->
-      </ul>
-    </nav>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="{% url 'BracketApp:bracket_entry' %}">Submit a bracket</a>
+          </li> -->
+          <!-- <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Past seasons</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="#">Item 1</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="#">Item 2</a>
+            </div>
+          </li> -->
+          <!--<li class="nav-item"><a class="nav-link" href="{% url 'BracketApp:help' %}">Help</a></li>-->
+        </ul>
+      </nav>
 
-    <div class="container">
-      {% block body_block %}
-      <!-- Anything outside of this will be inherited if you extend! -->
-      {% endblock %}
+      <div id="content-wrap" class="container">
+        {% block body_block %}
+        <!-- Anything outside of this will be inherited if you extend! -->
+        {% endblock %}
+      </div>
+
+      <footer id="footer">
+        <p>BrackeTracker is not owned by, affiliated with, or operated under ABC. ABC owns all rights to contestant photos, footage, and other related assets.</p>
+      </footer>
     </div>
   </body>
 </html>
