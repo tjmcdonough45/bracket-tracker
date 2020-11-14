@@ -552,7 +552,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='Survivor'
+    show='Bachelor'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
