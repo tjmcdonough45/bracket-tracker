@@ -56,7 +56,7 @@ class BracketAdmin(admin.ModelAdmin):
     search_fields = ['player__name','player__user__user__username','contestant__first_name','contestant__last_name']
     list_filter = ['player__season','player__user__user__username','predicted_rank']
     list_display = ['player','contestant','predicted_rank','predicted_elimination','submitted']
-    # list_editable = ['contestant','predicted_rank','predicted_elimination']
+    list_editable = ['predicted_rank','predicted_elimination']
 
 class ScoreAdmin(admin.ModelAdmin):
     fields = ['player','elimination','rank','cum_score','points_back','score','maximum_points_remaining']
