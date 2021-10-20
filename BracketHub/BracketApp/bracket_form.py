@@ -43,25 +43,25 @@ class BaseBracketFormSet(forms.BaseInlineFormSet):
 BracketFormSet = inlineformset_factory(Player, #parent form
                                         Bracket, #inline form model
                                         formset=BaseBracketFormSet,
-                                        fields=['predicted_elimination','contestant'], #inline form fields
-                                        #fields=['predicted_rank','contestant'], #inline form fields
+                                        #fields=['predicted_elimination','contestant'], #inline form fields
+                                        fields=['predicted_rank','contestant'], #inline form fields
                                         # fields=['contestant'],
                                         labels={ #labels for the fields
                                             'contestant':'Contestant',
-                                            'predicted_elimination':'Rose Ceremony',
-                                            #'predicted_rank':'Finish',
+                                            #'predicted_elimination':'Rose Ceremony',
+                                            'predicted_rank':'Finish',
                                         },
                                         help_texts={ #help texts for the fields
                                             'contestant': None,
-                                            'predicted_elimination': None,
-                                            #'predicted_rank': None,
+                                            #'predicted_elimination': None,
+                                            'predicted_rank': None,
                                         },
                                         widgets = {
-                                            'predicted_elimination': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_elimination field read-only; populate with necessary options in view
-                                            #'predicted_rank': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_rank field read-only; populate with necessary options in view
+                                            #'predicted_elimination': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_elimination field read-only; populate with necessary options in view
+                                            'predicted_rank': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_rank field read-only; populate with necessary options in view
                                         },
                                         can_delete=False, #set to false because can't delete a non-existent instance
-                                        extra=23) #how many inline forms are in template by default
+                                        extra=13) #how many inline forms are in template by default
 
 class BonusForm(forms.ModelForm):
     class Meta():

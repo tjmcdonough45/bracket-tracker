@@ -259,7 +259,7 @@ def current_season_survivor(request):
         xaxis={'title':'Elimination'},
         yaxis=dict(
             title='Cumulative Score',
-            range=[0,1350],
+            range=[0,400],
             linecolor='black',
             titlefont=dict(
                 color='steelblue'
@@ -270,7 +270,7 @@ def current_season_survivor(request):
         ),
         yaxis2=dict(
             title='Maximum Points Possible',
-            range=[0,1350],
+            range=[0,400],
             linecolor='black',
             titlefont=dict(
                 color='orange'
@@ -553,7 +553,7 @@ def bracket_entry(request):
     user = request.user
     userprofileinfo = UserProfileInfo.objects.filter(user__exact=user)[0]
     # show = Show.objects.filter(id__exact=season.show_id).values()[0]['name']
-    show='Bachelor'
+    show='Survivor'
 
     if show == 'Survivor':
         qs_season = Season.objects.filter(current_season__exact=True,show__name__exact='Survivor')
@@ -561,7 +561,7 @@ def bracket_entry(request):
         first_scored_elimination = season.first_scored_elimination
         contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name') #contestants booted on or after first scored elimination
         num_contestants = len(contestants.values_list())
-        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=21):
+        if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=40):
             entry_open = True
         else:
             entry_open = False
