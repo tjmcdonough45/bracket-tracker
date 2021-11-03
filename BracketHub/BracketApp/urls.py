@@ -5,7 +5,8 @@ from BracketApp import views
 app_name = 'BracketApp'
 
 urlpatterns = [
-    path('bracket_entry/',views.bracket_entry,name='bracket_entry'),
+    path('bracket_entry_bachelor/',views.bracket_entry_bachelor,name='bracket_entry_bachelor'),
+    path('bracket_entry_survivor/',views.bracket_entry_survivor,name='bracket_entry_survivor'),
     path('current_season/', views.current_season, name='current_season'),
     path('current_season_survivor/',views.current_season_survivor,name='current_season_survivor'),
     path('seasons/', views.SeasonListView.as_view(), name='seasons'),
