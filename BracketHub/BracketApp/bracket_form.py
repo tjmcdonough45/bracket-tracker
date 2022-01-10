@@ -61,7 +61,7 @@ BracketFormSet = inlineformset_factory(Player, #parent form
                                             #'predicted_rank': forms.TextInput(attrs={'readonly': 'readonly'}), #make predicted_rank field read-only; populate with necessary options in view
                                         },
                                         can_delete=False, #set to false because can't delete a non-existent instance
-                                        extra=19) #how many inline forms are in template by default
+                                        extra=22) #how many inline forms are in template by default
 
 SurvivorBracketFormSet = inlineformset_factory(Player, #parent form
                                         Bracket, #inline form model
