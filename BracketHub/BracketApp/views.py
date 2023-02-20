@@ -40,7 +40,7 @@ def current_season(request):
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
     # change for each new season
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
+    predicted_rank_init = [1,2,3,4,5,5,6,6,7,7,7,8,8,8,9,9,9,10,10,10]
     # predicted_elimination_init = [1,1,1,1,2,2,2,3,3,3,4,4,4,5,5,6,7,8,9]
     plot_y_max = 375
 
@@ -70,7 +70,7 @@ def current_season(request):
     x1=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('elimination',flat=True))
     points_per_contestant_remaining=list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('points_per_contestant_remaining',flat=True))
     num_boots = list(Point.objects.filter(season__exact=season).order_by('elimination').values_list('num_boots',flat=True))
-    num_contestants_remaining = -np.cumsum(num_boots)+22
+    num_contestants_remaining = -np.cumsum(num_boots)+20
     ideal=num_contestants_remaining*np.array(points_per_contestant_remaining)
     y1=np.cumsum(ideal)
     y2=np.repeat(np.sum(ideal),len(x1))
@@ -560,7 +560,7 @@ def bracket_entry_bachelor(request):
     first_scored_elimination = season.first_scored_elimination
     contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('first_name')
     num_contestants = len(contestants.values_list())
-    if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=14):
+    if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) > timezone.now()-datetime.timedelta(days=50):
         entry_open = True
     else:
         entry_open = False
@@ -568,8 +568,8 @@ def bracket_entry_bachelor(request):
     num_scoring_rounds = len(points.values_list())
     num_eliminations = num_scoring_rounds+first_scored_elimination-1
     # Update these for each season
-    predicted_rank_init = [1,2,3,4,5,5,6,6,6,7,7,7,8,8,8,9,9,9,10,10,10,10]
-    predicted_elimination_init = [2,2,2,2,3,3,3,4,4,4,5,5,5,6,6,6,7,7,8,9,10,11]
+    predicted_rank_init = [1,2,3,4,5,5,6,6,7,7,7,8,8,8,9,9,9,10,10,10]
+    predicted_elimination_init = [2,2,2,3,3,3,4,4,4,5,5,5,6,6,7,7,8,9,10,11]
     if len(Bracket.objects.filter(player__user__exact=userprofileinfo,player__season__exact=season).values_list())==0:
         submitted = False
         if request.method == "POST":
