@@ -176,7 +176,7 @@ def current_season_survivor(request):
     num_scoring_rounds = num_eliminations-first_scored_elimination+1
     cur_boots = contestants.filter(actual_elimination__lte=cur_elimination).order_by('actual_rank')
     predicted_rank_init = np.arange(num_scoring_rounds+1)+1
-    plot_y_max=850
+    plot_y_max=500
 
     cur_scores = Score.objects.filter(player__season__exact=season,elimination__exact=cur_elimination).order_by('rank','-maximum_points_remaining')
     scores = {}
@@ -615,7 +615,7 @@ def bracket_entry_survivor(request):
     first_scored_elimination = season.first_scored_elimination
     contestants = Contestant.objects.filter(season__exact=season,actual_elimination__gte=first_scored_elimination).order_by('last_name') #contestants booted on or after first scored elimination
     num_contestants = len(contestants.values_list())
-    if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=21):
+    if datetime.datetime.combine(season.premiere,datetime.time(0,0,0,tzinfo=pytz.utc)) >= timezone.now()-datetime.timedelta(days=28):
         entry_open = True
     else:
         entry_open = False
